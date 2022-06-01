@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.boden.lingvolearner"
-    android:versionCode="2"
-    android:versionName="2.0"
-    android:requestLegacyExternalStorage="true">
-
-    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
-    <!--<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"-->
-        <!--android:maxSdkVersion="28" />-->
-    <!--<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />-->
-
-
-
+    android:requestLegacyExternalStorage="true"
+    android:versionCode="3"
+    android:versionName="2.1">
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-       
-        
+        android:theme="@style/AppTheme">
+
+
         <activity
             android:name="com.boden.lingvolearner.MainFormActivity"
-            android:label="@string/app_name" >
+            android:exported="true"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,28 +24,28 @@
         </activity>
         <activity
             android:name="com.boden.lingvolearner.WritingWordsActivity"
-            android:label="@string/app_name3" >
-        </activity>
+            android:exported="true"
+            android:label="@string/app_name3"></activity>
         <activity
             android:name="com.boden.lingvolearner.OptionActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:exported="true"
+            android:label="@string/app_name"></activity>
         <activity
             android:name="com.boden.lingvolearner.HelpActivity"
-            android:label="@string/app_name" >
-        </activity>
+            android:exported="true"
+            android:label="@string/app_name"></activity>
         <activity
             android:name="com.boden.lingvolearner.LastOpendActivity"
-            android:label="@string/title_activity_last_opend" >
-        </activity>
+            android:exported="true"
+            android:label="@string/title_activity_last_opend"></activity>
         <activity
             android:name="com.boden.lingvolearner.SelectDirActivity"
-            android:label="@string/title_activity_select_dir" >           
-        </activity>
+            android:exported="true"
+            android:label="@string/title_activity_select_dir"></activity>
         <activity
             android:name="com.boden.lingvolearner.SelectNewPathActivity"
-            android:label="@string/title_activity_select_new_path" >           
-        </activity>
+            android:exported="true"
+            android:label="@string/title_activity_select_new_path"></activity>
     </application>
 
 </manifest>
