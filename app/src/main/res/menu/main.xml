@@ -1,0 +1,41 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.boden.lingvist.MainFormActivity" >
+
+ <item
+        android:id="@+id/menu_prev_step"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/prev_step"/>
+    <item
+        android:id="@+id/menu_next_step"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/next_step"/>
+    <item
+        android:id="@+id/menu_open"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/open"/>
+    <item
+        android:id="@+id/menu_last_opend"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/last_opend"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/menu_settings"/>
+    <item
+        android:id="@+id/menu_help"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/help"/>
+    <item
+        android:id="@+id/menu_exit"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/exit"/>
+
+</menu>

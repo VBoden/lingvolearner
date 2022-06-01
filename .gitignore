@@ -1,0 +1,14 @@
+bin/
+.classpath
+.project
+gen
+libs
+*.apk
+.gradle
+.idea
+*.iml
+gradlew
+gradlew.bat
+gradle
+build
+

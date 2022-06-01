@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    
+    
+     <string name="app_name">Лінгвіст</string>
+    <string name="app_name2">Лінгвіст: переклад слів</string>
+    <string name="app_name3">Лінгвіст: написання слів</string>
+    <string name="selectdict">виберіть словник</string>
+    <string name="words">"слова "</string>
+    <string name="end_of_dict">"Досягнуто кінця словника. Вивчення буде розпочато з початку"</string>
+    <string name="prev_step">"Попередній етап"</string>
+    <string name="next_step">"Наступний етап"</string>
+    <string name="last_opend">"Недавно відкриті"</string>
+    <string name="help">"Допомога"</string>
+    <string name="exit">"Вийти"</string>
+    <string name="parameters">"Параметри відображення"</string>
+    <string name="smaller_size">"Зменшити шрифт"</string>
+    <string name="bigger_size">"Збільшити шрифт"</string>
+    <string name="smaller_distance">"Зменшити відстань між рядками"</string>
+    <string name="bigger_distance">"Збільшити відстань між рядками"</string>
+    <string name="start_from">"Розпочати з..."</string>
+    <string name="start_from_number">"Розпочати з слова під номером"</string>
+    <string name="ok">"Ок"</string>
+    <string name="wrong_number">"Введено не вірне число. Початковий номер не змінений"</string>
+    <string name="cancel">"Відмінити"</string>
+    
+    
+    <string name="actions_with_dicts">"Дії із словниками"</string>
+    <string name="change_dict_name">"Змінити назву словника"</string>
+    <string name="set_new_path">"Вказати нове розміщення словника"</string>
+    <string name="delete_dict">"Видалити словник зі списку"</string>
+    <string name="editing_dict">"Редагування словника"</string>
+    <string name="set_new_name">"Введіть нову назву словника"</string>
+    <string name="change">"Змінити"</string>
+    <string name="deleting_dict">"Видалення словника"</string>
+    <string name="do_you_wish_delete">"Ви дійсно бажаєте  видалити словник?"</string>
+    <string name="delete">"Видалити"</string>
+    <string name="select">"Вибрати"</string>
+    
+    
+    <string name="open">Вибрати словник</string>
+    <string name="option_kilk">Повторювати слова (кількість раз):</string>
+    <string name="option_use_TTS">Промовляти слова, використовуючи TTS</string>
+    <string name="option_use_GoogleTTS">Google TTS</string>
+    <string name="option_use_FliteTTS">Flite TTS</string>
+    <string name="option_use_sound_files">Використовувати звукові файли при наявності</string>
+    <string name="option_language_label">Будь ласка, виберіть мову промовляння</string>
+    <string name="option_sound_files_path">Шлях до папки звукових файлів:</string>
+    <string name="title_activity_select_dict">Вибрати словник</string>
+    <string name="menu_settings">Налаштування</string>
+    <string name="settings_shortcut">s</string>
+    <string name="menu_dicstmanager">Управління словниками</string>
+    <string name="dicstmanager_shortcut">d</string>
+    <string name="title_activity_last_opend">Недавно відкриті словники</string>
+    <string name="title_activity_select_dir">Тека із звуковими файлами</string>
+    <string name="title_activity_select_new_path">Нове розміщення словника</string>
+     <string name="coud_not_open_help">"Не вдалось відкрити довідку"</string>
+    
+
+</resources>
