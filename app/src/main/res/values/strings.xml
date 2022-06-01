@@ -5,9 +5,9 @@
     <string name="action_settings">Settings</string>
     
     
-     <string name="app_name">Лінгвіст</string>
-    <string name="app_name2">Лінгвіст: переклад слів</string>
-    <string name="app_name3">Лінгвіст: написання слів</string>
+     <string name="app_name">Лінгво-зубрилка</string>
+    <string name="app_name2">Лінгво-зубрилка: переклад слів</string>
+    <string name="app_name3">Лінгво-зубрилка: написання слів</string>
     <string name="selectdict">виберіть словник</string>
     <string name="words">"слова "</string>
     <string name="end_of_dict">"Досягнуто кінця словника. Вивчення буде розпочато з початку"</string>

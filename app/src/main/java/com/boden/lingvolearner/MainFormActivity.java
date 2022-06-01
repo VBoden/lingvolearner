@@ -4,9 +4,13 @@ package com.boden.lingvolearner;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Random;
 
 
@@ -20,7 +24,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.text.Html;
 import android.text.InputType;
 //import android.util.Log;
@@ -245,57 +251,86 @@ public class MainFormActivity extends GeneralMainActivity {
 				startFromNumber = dict.getBeginFrom();
 			//	Log.i("DEBUG_INFO_MY", "now started loadDict");
 				if ((new File(vocab)).exists()){
-					loadDict(vocab);				
+					loadDict(Uri.parse(vocab));
 			//	Log.i("DEBUG_INFO_MY", "finished loadDict");
 				hasDict = true;}
 			}
 		}
 		
 		if (!hasDict) {
-			Intent theIntent = new Intent();
-			theIntent.setClass(MainFormActivity.this, SelectDict.class);
-			// startActivityForResult(new Intent(thi, SelectDict.class), 1);
-			// Intent theIntent = new Intent(Intent.ACTION_PICK);
-			// theIntent.setData(Uri.fromFile(new File("/mnt/sdcard/")));
-			// //default
-			// file / jump directly to this file/folder
-			// theIntent.putExtra(Intent.EXTRA_TITLE,"A Custom Title");
-			// //optional
-			// theIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-			// //optional
-			try {
-				startActivityForResult(theIntent, REQUEST_CODE_SELECTDICT);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			startDictFileSelection();
+
+
+//			Intent theIntent = new Intent();
+//			theIntent.setClass(MainFormActivity.this, SelectDict.class);
+//			// startActivityForResult(new Intent(thi, SelectDict.class), 1);
+//			// Intent theIntent = new Intent(Intent.ACTION_PICK);
+//			// theIntent.setData(Uri.fromFile(new File("/mnt/sdcard/")));
+//			// //default
+//			// file / jump directly to this file/folder
+//			// theIntent.putExtra(Intent.EXTRA_TITLE,"A Custom Title");
+//			// //optional
+//			// theIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+//			// //optional
+//			try {
+//				startActivityForResult(theIntent, REQUEST_CODE_SELECTDICT);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
 		}
-		// Bundle extras = getIntent().getExtras();
-		// String vocab=extras.getString(EXT_NAME_VOC);
-		// loadDict(vocab);
 
 	}
 
-	public void loadDict(String vocab) {
-		FileInputStream iFile;
-		try {
-			iFile = new FileInputStream(new File(vocab));			
-			String strLine = null;
+	private void startDictFileSelection() {
+		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		intent.setType("*/*");
+//		intent.putExtra(Intent.EXTRA_MIME_TYPES, Collections.singletonList("application/vcb").toArray());
 
-			InputStreamReader tmp = new InputStreamReader(iFile, "UTF8");
-			BufferedReader dataIO = new BufferedReader(tmp);
-			StringBuffer sBuffer = new StringBuffer();
-			while ((strLine = dataIO.readLine()) != null) {
-				sBuffer.append(strLine);
+		// Optionally, specify a URI for the file that should appear in the
+		// system file picker when it loads.
+//			intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
+
+
+		try {
+			startActivityForResult(intent, REQUEST_CODE_SELECTDICT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void loadDict(Uri uri) {
+
+		StringBuilder stringBuilder = new StringBuilder();
+		try (InputStream inputStream =
+					 getContentResolver().openInputStream(uri);
+			 BufferedReader reader = new BufferedReader(
+					 new InputStreamReader(Objects.requireNonNull(inputStream),"UTF8"))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				stringBuilder.append(line);
 			}
-			dataIO.close();
-			iFile.close();
+
+
+//		FileInputStream iFile;
+//			iFile = new FileInputStream(new File(vocab));
+//			String strLine = null;
+
+//			InputStreamReader tmp = new InputStreamReader(iFile, "UTF8");
+//			BufferedReader dataIO = new BufferedReader(tmp);
+//			StringBuffer sBuffer = new StringBuffer();
+//			while ((strLine = dataIO.readLine()) != null) {
+//				sBuffer.append(strLine);
+//			}
+//			dataIO.close();
+//			iFile.close();
 			int pos;
 			int pos1 = 0;
 			int pos2 = 0;
 			int pos21 = 0;
 			int i = 0;
 			k = 0;
-			String s = sBuffer.toString();
+			String s = stringBuilder.toString();
 			pos = -1;
 			String s1 = "";
 			while (s.indexOf("%", pos) > 0) {
@@ -312,6 +347,7 @@ public class MainFormActivity extends GeneralMainActivity {
 				rozmir_mas = i;
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 			// text.setText("Error loading file: " + e.getMessage());
 		}
 
@@ -528,14 +564,15 @@ public class MainFormActivity extends GeneralMainActivity {
 				 * dictionaries = settings.getString(DICTIONARIES, ""); }
 				 */
 			//	Log.i("DEBUG_INFO_MY", "resultOfIntent");
-				Bundle extras = data.getExtras();
-				// String theFilePath = extras.getString(SELECTED_DICT);
-				vocab = extras.getString(EXT_NAME_VOC);
+				vocab = data.getDataString();
+//				vocab = data.getData().getPath();
+
 				// dict=new Dict(vocab,
 				// vocab.substring(vocab.lastIndexOf('/')+1));
 			//	Log.i("DEBUG_INFO_MY", "now started loadDict");
-				loadDict(vocab);
-
+//				loadDict(vocab);
+				loadDict(data.getData());
+Uri url = data.getData();
 				// Toast.makeText(DictsManager.this,
 				// theFilePath,
 				// Toast.LENGTH_LONG).show();
@@ -573,7 +610,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			prevStep();
 			return true;
 		case R.id.menu_open:
-			openDict();
+			startDictFileSelection();
 			return true;
 		case R.id.menu_settings:
 			settings();
@@ -596,16 +633,6 @@ public class MainFormActivity extends GeneralMainActivity {
 				MODE_PRIVATE);
 		String language = settings.getString(LANGUAGE,Locale.US.getLanguage());
 		speaker.updateLanguageSelection(language);
-	}
-
-	private void openDict() {
-		Intent theIntent = new Intent();
-		theIntent.setClass(MainFormActivity.this, SelectDict.class);
-		try {
-			startActivityForResult(theIntent, REQUEST_CODE_SELECTDICT);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	private void prevStep() {
