@@ -1,13 +1,13 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Stack;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.content.Intent;
-//import android.content.SharedPreferences;
+import android.content.SharedPreferences;
+import android.os.Environment;
 import android.text.Html;
 //import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,27 +20,31 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class SelectNewPathActivity extends Activity {
+
+public class SelectDict extends GeneralMainActivity {
 	private ListView fileList;
 	private String[] items;
 	private ArrayList<String> listOfFiles;
 	private ArrayList<String> listOfFileNames;
 	private Stack<String> stackPaths=new Stack<String>();
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_dict);
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_select_dict);
 
 		fileList = (ListView) findViewById(R.id.listView1);
 
 		listOfFiles = new ArrayList<String>();
 		listOfFileNames = new ArrayList<String>();
 
-		getFile(new File("/mnt/sdcard/"));
+		getFile(new File("/mnt/sdcard"));
+		stackPaths.push(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
 		stackPaths.push("/");
 		stackPaths.push("/mnt/");
-		stackPaths.push("/mnt/sdcard/");		
+		//Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString();
+		stackPaths.push("/mnt/sdcard");
+		//stackPaths.push(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString());
 
 		items = listOfFileNames.toArray(new String[listOfFiles.size()]);
 		setAdapterToList(items);
@@ -59,10 +63,21 @@ public class SelectNewPathActivity extends Activity {
 					items = listOfFileNames.toArray(new String[listOfFiles.size()]);
 					setAdapterToList(items);}
 				} else if (!f.isDirectory()) {
+					SharedPreferences settings=getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+					String dictionaries="";
+					if (settings.contains(DICTIONARIES) == true) {
+						dictionaries = settings.getString(DICTIONARIES, "");					
+					}					
+	                SharedPreferences.Editor prefEditor=settings.edit();
+	                Dict dict=new Dict(listOfFiles.get(position), items[position].substring(0,items[position].lastIndexOf('.')));
+	                prefEditor.putString(DICTIONARIES, dict.toString()+dictionaries);
+	              //  Log.i("DEBUG_INFO_MY","saved dictionary: "+dict.toString()+dictionaries);
+	                prefEditor.commit();
+					
 					Intent intent = new Intent();
-					intent.putExtra(LastOpendActivity.EXT_NEW_PATH, listOfFiles.get(position));
+					intent.putExtra(MainFormActivity.EXT_NAME_VOC, listOfFiles.get(position));
 					setResult(RESULT_OK, intent);
-					finish(); 					
+					finish();
 				} else {
 					stackPaths.push(f.toString());
 					getFile(f);
@@ -72,8 +87,8 @@ public class SelectNewPathActivity extends Activity {
 
 			}
 		});
-    }
 
+	}
 
 	public void setAdapterToList(String[] items) {
 		ArrayAdapter<String> adapt = new ArrayAdapter<String>(this,
@@ -111,11 +126,11 @@ public class SelectNewPathActivity extends Activity {
 	public void getFile(File dir) {
 		listOfFiles.clear();
 		listOfFileNames.clear();
-		//Log.i("DEBUG_SELECTDICT","start");
+	//	Log.i("DEBUG_SELECTDICT","start");
 		listOfFiles.add(dir.toString());
 		listOfFileNames.add(dir.toString());
 		String[] dirs = dir.list();
-		if (dirs.length > 0) {
+		if (dirs!=null && dirs.length > 0) {
 			for (int i = 0; i < dirs.length; i++) {
 				File f = new File(dir, dirs[i]);
 				if (f.isDirectory() && f.getName().charAt(0)!='.') {
@@ -138,12 +153,12 @@ public class SelectNewPathActivity extends Activity {
 			}
 
 		}
-	//	Log.i("DEBUG_SELECTDICT","end of load");
+		//Log.i("DEBUG_SELECTDICT","end of load");
 	}
-    
-  //  @Override
-  //  public boolean onCreateOptionsMenu(Menu menu) {
-    //    getMenuInflater().inflate(R.menu.activity_select_new_path, menu);
- //       return true;
- //   }
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	//	getMenuInflater().inflate(R.menu.activity_select_dict, menu);
+		return true;
+	}
 }

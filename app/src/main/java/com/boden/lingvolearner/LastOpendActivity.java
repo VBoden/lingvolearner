@@ -1,4 +1,4 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 import java.util.ArrayList;
 //import java.util.prefs.Preferences;

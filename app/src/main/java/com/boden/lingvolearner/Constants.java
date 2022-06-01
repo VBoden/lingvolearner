@@ -1,4 +1,4 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 public final class Constants {
 

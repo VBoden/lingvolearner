@@ -1,10 +1,9 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 //import android.app.Activity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -12,7 +11,7 @@ import java.util.Random;
 
 
 
-//import com.vboden.lingvist.R;
+//import com.vboden.lingvolearner.R;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -21,10 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.text.Html;
 import android.text.InputType;
 //import android.util.Log;

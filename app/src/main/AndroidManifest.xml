@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.boden.lingvist"
+    package="com.boden.lingvolearner"
     android:versionCode="2"
     android:versionName="2.0"
     android:requestLegacyExternalStorage="true">
 
-    <uses-sdk
-        android:minSdkVersion="15" />
-    
-     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
@@ -24,7 +21,7 @@
        
         
         <activity
-            android:name=".MainFormActivity"
+            android:name="com.boden.lingvolearner.MainFormActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,31 +30,31 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".WritingWordsActivity"
+            android:name="com.boden.lingvolearner.WritingWordsActivity"
             android:label="@string/app_name3" >
         </activity>
         <activity
-            android:name=".OptionActivity"
+            android:name="com.boden.lingvolearner.OptionActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".HelpActivity"
+            android:name="com.boden.lingvolearner.HelpActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".SelectDict"
+            android:name="com.boden.lingvolearner.SelectDict"
             android:label="@string/title_activity_select_dict" >
         </activity>
         <activity
-            android:name=".LastOpendActivity"
+            android:name="com.boden.lingvolearner.LastOpendActivity"
             android:label="@string/title_activity_last_opend" >
         </activity>
         <activity
-            android:name=".SelectDirActivity"
+            android:name="com.boden.lingvolearner.SelectDirActivity"
             android:label="@string/title_activity_select_dir" >           
         </activity>
         <activity
-            android:name=".SelectNewPathActivity"
+            android:name="com.boden.lingvolearner.SelectNewPathActivity"
             android:label="@string/title_activity_select_new_path" >           
         </activity>
     </application>

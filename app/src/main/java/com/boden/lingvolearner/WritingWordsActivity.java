@@ -1,8 +1,5 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
 import java.util.Random;
 
 import android.annotation.TargetApi;
@@ -10,10 +7,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.TextToSpeech.OnInitListener;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;

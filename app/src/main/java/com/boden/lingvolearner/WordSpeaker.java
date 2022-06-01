@@ -1,4 +1,4 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,7 +7,7 @@ import android.media.MediaPlayer;
 import java.io.File;
 import java.io.IOException;
 
-import static com.boden.lingvist.Constants.USE_TTS_TO_SAY;
+import static com.boden.lingvolearner.Constants.USE_TTS_TO_SAY;
 
 public class WordSpeaker {
 

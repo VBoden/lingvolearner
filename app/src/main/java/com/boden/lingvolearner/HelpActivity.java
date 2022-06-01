@@ -1,4 +1,4 @@
-package com.boden.lingvist;
+package com.boden.lingvolearner;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
