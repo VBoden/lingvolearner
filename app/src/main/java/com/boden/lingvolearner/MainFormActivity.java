@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
@@ -64,7 +65,7 @@ public class MainFormActivity extends GeneralMainActivity {
 
 	private int k;
 	private Dict dict;
-	private ArrayList<Dict> listOfDicts;
+	private ArrayList<Dict> listOfDicts = new ArrayList<>();
 	private float textSize = 0;
 	private int textPadding = 0;
 
@@ -285,13 +286,15 @@ public class MainFormActivity extends GeneralMainActivity {
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 		intent.setType("*/*");
+
+//		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//		intent.addCategory(Intent.CATEGORY_OPENABLE);
+//		intent.setType("file/*");
 //		intent.putExtra(Intent.EXTRA_MIME_TYPES, Collections.singletonList("application/vcb").toArray());
 
 		// Optionally, specify a URI for the file that should appear in the
 		// system file picker when it loads.
 //			intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-
-
 		try {
 			startActivityForResult(intent, REQUEST_CODE_SELECTDICT);
 		} catch (Exception e) {
@@ -299,6 +302,16 @@ public class MainFormActivity extends GeneralMainActivity {
 		}
 	}
 
+	private void startDictFileSelectionForSamsung() {
+		Intent intent = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+		intent.putExtra("CONTENT_TYPE","*/*");
+		intent.addCategory(Intent.CATEGORY_DEFAULT);
+		try {
+			startActivityForResult(intent, REQUEST_CODE_SELECTDICT);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	public void loadDict(Uri uri) {
 
 		StringBuilder stringBuilder = new StringBuilder();
@@ -363,6 +376,9 @@ public class MainFormActivity extends GeneralMainActivity {
 				startFromNumber = dict.getBeginFrom();
 			}
 		}
+		String[] segments = uri.getLastPathSegment().split("/");
+		listOfDicts.add(new Dict(uri.getPath(), segments[segments.length-1]));
+		saveChangedDictsList();
 		// kilk_povt = 5;
 		krok_povtory = kilk_povt;
 		k_zal_sliv = 10;
@@ -552,32 +568,9 @@ public class MainFormActivity extends GeneralMainActivity {
 			//}
 			break;
 		case REQUEST_CODE_SELECTDICT:
-			// if (resultCode==RESULT_OK && data!=null && data.getData()!=null)
-			// {
-			// String theFilePath = data.getData().getPath();
-
 			if (resultCode == RESULT_OK) {
-				/*
-				 * SharedPreferences settings =
-				 * getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE); String
-				 * dictionaries; if (settings.contains(DICTIONARIES) == true) {
-				 * dictionaries = settings.getString(DICTIONARIES, ""); }
-				 */
-			//	Log.i("DEBUG_INFO_MY", "resultOfIntent");
 				vocab = data.getDataString();
-//				vocab = data.getData().getPath();
-
-				// dict=new Dict(vocab,
-				// vocab.substring(vocab.lastIndexOf('/')+1));
-			//	Log.i("DEBUG_INFO_MY", "now started loadDict");
-//				loadDict(vocab);
 				loadDict(data.getData());
-Uri url = data.getData();
-				// Toast.makeText(DictsManager.this,
-				// theFilePath,
-				// Toast.LENGTH_LONG).show();
-				// dictLoad =new DictLoaderTask();
-				// dictLoad.execute(theFilePath);
 			}
 			break;
 
