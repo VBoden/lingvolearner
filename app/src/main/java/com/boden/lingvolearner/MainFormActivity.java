@@ -1,20 +1,13 @@
 package com.boden.lingvolearner;
 
 //import android.app.Activity;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Random;
 
-
+import com.boden.lingvolearner.pojo.WordCard;
 
 //import com.vboden.lingvolearner.R;
 
@@ -22,30 +15,29 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.text.Html;
 import android.text.InputType;
 //import android.util.Log;
 import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 
 @TargetApi(14)
 public class MainFormActivity extends GeneralMainActivity {
@@ -54,8 +46,6 @@ public class MainFormActivity extends GeneralMainActivity {
 	private String vocab;
 	private String[] spisok2 = { "1", "2", "3", "4", "5", "6", "7", "8", "9",
 			"0" };
-	// String[][] spisok0=new String[2][20];
-	private String[][] slovnik = new String[3][20000];
 	private int rozmir_mas, startFromNumber, kilk_povt, krok_povtory,
 			k_zal_sliv, k_zapis, vprava;
 	private int kilk[] = new int[10];
@@ -63,11 +53,11 @@ public class MainFormActivity extends GeneralMainActivity {
 
 	private WordSpeaker speaker;
 
-	private int k;
 	private Dict dict;
 	private ArrayList<Dict> listOfDicts = new ArrayList<>();
 	private float textSize = 0;
 	private int textPadding = 0;
+	private List<WordCard> allWordCards;
 
 	public static final String EXT_NAME_VOC = "voc_name";
 	public static final String EXT_POCH_NOM = "poch_nom";
@@ -104,7 +94,7 @@ public class MainFormActivity extends GeneralMainActivity {
 		Vword.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				if (vprava == 1) {
-					speaker.speakText(slovnik[0][k_zapis]);
+					speaker.speakText(allWordCards.get(k_zapis).getWord());
 				}
 			}
 		});
@@ -126,7 +116,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			public void onItemClick(AdapterView<?> arg0, View itemClicked,
 					int position, long id) {
 				if (vprava == 1) {
-					if (spisok2[position].equals(slovnik[2][k_zapis])) {
+					if (spisok2[position].equals(allWordCards.get(k_zapis).getTranslation())) {
 						k_zal_sliv--;
 						kilk[k_zapis - startFromNumber]++;
 						if (k_zal_sliv == 0) {
@@ -156,8 +146,8 @@ public class MainFormActivity extends GeneralMainActivity {
 						Context context = MainFormActivity.this
 								.getApplicationContext();
 						Toast toast = Toast.makeText(context,
-								slovnik[0][k_zapis] + " - "
-										+ slovnik[2][k_zapis],
+								allWordCards.get(k_zapis).getWord() + " - "
+										+ allWordCards.get(k_zapis).getTranslation(),
 								Toast.LENGTH_SHORT);
 						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();						
@@ -165,8 +155,9 @@ public class MainFormActivity extends GeneralMainActivity {
 				}
 	// —————————————————————————————————————————————————— Другий етап ——————————————————————————————————————————————————————
 				else {
-					if (spisok2[position].equals(slovnik[0][k_zapis])) {
-						speaker.speakText(slovnik[0][k_zapis]);
+					String currWord = allWordCards.get(k_zapis).getWord();
+					if (spisok2[position].equals(currWord)) {
+						speaker.speakText(currWord);
 
 						k_zal_sliv--;
 						kilk[k_zapis - startFromNumber]++;
@@ -195,12 +186,12 @@ public class MainFormActivity extends GeneralMainActivity {
 									WritingWordsActivity.class);
 							String[] vocab = new String[10];
 							for (int i = 0; i < 10; i++) {
-								vocab[i] = slovnik[0][i + startFromNumber];
+								vocab[i] = allWordCards.get(i + startFromNumber).getWord();
 							}
 							intent.putExtra(WritingWordsActivity.EXT_SLOVNIK1, vocab);
 							String[] vocab2 = new String[10];
 							for (int i = 0; i < 10; i++) {
-								vocab2[i] = slovnik[2][i + startFromNumber];
+								vocab2[i] = allWordCards.get(i + startFromNumber).getTranslation();
 							}
 							intent.putExtra(WritingWordsActivity.EXT_SLOVNIK3, vocab2);
 							intent.putExtra(WritingWordsActivity.EXT_KROK_POVTORY,
@@ -218,9 +209,8 @@ public class MainFormActivity extends GeneralMainActivity {
 						// showDialog(1);
 						Context context = MainFormActivity.this
 								.getApplicationContext();
-						Toast toast = Toast.makeText(context,
-								slovnik[2][k_zapis] + " - "
-										+ slovnik[0][k_zapis],
+						Toast toast = Toast.makeText(context, allWordCards.get(k_zapis).getTranslation() + " - "
+								+ allWordCards.get(k_zapis).getWord(),
 								Toast.LENGTH_SHORT);
 						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();
@@ -252,7 +242,8 @@ public class MainFormActivity extends GeneralMainActivity {
 				startFromNumber = dict.getBeginFrom();
 			//	Log.i("DEBUG_INFO_MY", "now started loadDict");
 				if ((new File(vocab)).exists()){
-					loadDict(Uri.parse(vocab));
+					allWordCards = DictionaryFileManipulator.loadDictionaryByLines(Uri.parse(vocab), getContentResolver());
+					startFunctions(Uri.parse(vocab));
 			//	Log.i("DEBUG_INFO_MY", "finished loadDict");
 				hasDict = true;}
 			}
@@ -312,58 +303,8 @@ public class MainFormActivity extends GeneralMainActivity {
 			e.printStackTrace();
 		}
 	}
-	public void loadDict(Uri uri) {
 
-		StringBuilder stringBuilder = new StringBuilder();
-		try (InputStream inputStream =
-					 getContentResolver().openInputStream(uri);
-			 BufferedReader reader = new BufferedReader(
-					 new InputStreamReader(Objects.requireNonNull(inputStream),"UTF8"))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				stringBuilder.append(line);
-			}
-
-
-//		FileInputStream iFile;
-//			iFile = new FileInputStream(new File(vocab));
-//			String strLine = null;
-
-//			InputStreamReader tmp = new InputStreamReader(iFile, "UTF8");
-//			BufferedReader dataIO = new BufferedReader(tmp);
-//			StringBuffer sBuffer = new StringBuffer();
-//			while ((strLine = dataIO.readLine()) != null) {
-//				sBuffer.append(strLine);
-//			}
-//			dataIO.close();
-//			iFile.close();
-			int pos;
-			int pos1 = 0;
-			int pos2 = 0;
-			int pos21 = 0;
-			int i = 0;
-			k = 0;
-			String s = stringBuilder.toString();
-			pos = -1;
-			String s1 = "";
-			while (s.indexOf("%", pos) > 0) {
-				pos1 = pos;
-				pos = s.indexOf("%", pos1 + 1);
-				s1 = s.substring(pos1 + 1, pos + 1);
-				pos2 = s1.indexOf("|", 0);
-				slovnik[0][i] = s1.substring(0, pos2);
-				pos21 = s1.indexOf("|", pos2 + 1);
-				slovnik[1][i] = s1.substring(pos2 + 2, pos21 - 1);
-				pos2 = s1.indexOf("%", pos21 + 1);
-				slovnik[2][i] = s1.substring(pos21 + 1, pos2);
-				i++;
-				rozmir_mas = i;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			// text.setText("Error loading file: " + e.getMessage());
-		}
-
+	private void startFunctions(Uri uri) {
 		// ____________________
 		// poch_nom = 0;
 		SharedPreferences settings = getSharedPreferences(APP_PREFERENCES,
@@ -386,13 +327,9 @@ public class MainFormActivity extends GeneralMainActivity {
 		for (int i1 = 0; i1 <= 9; i1++) {
 			kilk[i1] = 0;
 		}
+		rozmir_mas = allWordCards.size();
 		Functions();
-		speaker.speakText(slovnik[0][k_zapis]);
-		// spisok2=new String[10];
-		// for (int i=0;i<10;i++){ spisok2[i]=slovnik[i][2]; }
-
-		// setListAdapter(new ArrayAdapter<String>(
-		// this,android.R.layout.simple_list_item_1,spisok2));
+		speaker.speakText(allWordCards.get(k_zapis).getWord());
 	}
 
 	@Override
@@ -405,8 +342,8 @@ public class MainFormActivity extends GeneralMainActivity {
 	public void Functions() {
 		Context context = getApplicationContext();
 		Toast toast = Toast.makeText(context, getResources().getString(R.string.words) 
-				+ slovnik[0][startFromNumber] + "-"
-				+ slovnik[0][startFromNumber + 9] + " ("
+				+ allWordCards.get(startFromNumber).getWord() + "-"
+				+ allWordCards.get(startFromNumber+9).getWord() + " ("
 				+ (startFromNumber + 1) + "-" + (startFromNumber + 10) + ")",
 				Toast.LENGTH_SHORT);
 		toast.setGravity(Gravity.CENTER, 0, 0);
@@ -414,15 +351,15 @@ public class MainFormActivity extends GeneralMainActivity {
 		// statusBar.setText("Переклад з англійської на українську: слова "+slovnik[poch_nom][0]+"-"+slovnik[poch_nom
 		// +9][0]+" ("+poch_nom+","+(poch_nom+9)+")");
 		k_zapis = startFromNumber + rnd.nextInt(100) % 10;
-		Vword.setText(slovnik[0][k_zapis]);
-		if (slovnik[1][k_zapis].length() > 0) {
-			Vtransc.setText("[" + slovnik[1][k_zapis] + "]");
+		Vword.setText(allWordCards.get(k_zapis).getWord());
+		if (allWordCards.get(k_zapis).getTranscription().length() > 0) {
+			Vtransc.setText(allWordCards.get(k_zapis).getTranscription());
 		} else {
 			Vtransc.setText(" ");
 		}
 		spisok2 = new String[10];
 		for (int i = 0; i < 10; i++) {
-			spisok2[i] = slovnik[2][startFromNumber + i];
+			spisok2[i] = allWordCards.get(startFromNumber + i).getTranslation();
 		}
 		// listView.setAdapter(new ArrayAdapter<String>(this,
 		// android.R.layout.simple_list_item_1,spisok2));
@@ -435,10 +372,10 @@ public class MainFormActivity extends GeneralMainActivity {
 		do {
 			k_zapis = startFromNumber + rnd.nextInt(100) % 10;
 		} while (kilk[k_zapis - startFromNumber] >= 1);
-		Vword.setText(slovnik[0][k_zapis]);
-		speaker.speakText(slovnik[0][k_zapis]);
-		if (slovnik[1][k_zapis].length() > 0) {
-			Vtransc.setText("[" + slovnik[1][k_zapis] + "]");
+		Vword.setText(allWordCards.get(k_zapis).getWord());
+		speaker.speakText(allWordCards.get(k_zapis).getWord());
+		if (allWordCards.get(k_zapis).getTranscription().length() > 0) {
+			Vtransc.setText(allWordCards.get(k_zapis).getTranscription());
 		} else {
 			Vtransc.setText(" ");
 		}
@@ -448,11 +385,11 @@ public class MainFormActivity extends GeneralMainActivity {
 		// statusBar.setText("Переклад з української на англійську: слова "+slovnik[poch_nom][0]+"-"+slovnik[poch_nom
 		// +9][0]+" ("+poch_nom+","+(poch_nom+9)+")");
 		k_zapis = startFromNumber + rnd.nextInt(100) % 10;
-		Vword.setText(slovnik[2][k_zapis]);
+		Vword.setText(allWordCards.get(k_zapis).getTranslation());
 		Vtransc.setText(" ");
 		spisok2 = new String[10];
 		for (int i = 0; i < 10; i++) {
-			spisok2[i] = slovnik[0][startFromNumber + i];
+			spisok2[i] = allWordCards.get(startFromNumber + i).getWord();
 		}
 		// listView.setAdapter(new ArrayAdapter<String>(this,
 		// android.R.layout.simple_list_item_1,
@@ -467,7 +404,7 @@ public class MainFormActivity extends GeneralMainActivity {
 		do {
 			k_zapis = startFromNumber + rnd.nextInt(100) % 10;
 		} while (kilk[k_zapis - startFromNumber] >= 1);
-		Vword.setText(slovnik[2][k_zapis]);
+		Vword.setText(allWordCards.get(k_zapis).getTranslation());
 		Vtransc.setText(" ");
 	}
 
@@ -515,7 +452,7 @@ public class MainFormActivity extends GeneralMainActivity {
 					saveChangedDictsList();
 
 					Functions();
-					speaker.speakText(slovnik[0][k_zapis]);
+					speaker.speakText(allWordCards.get(k_zapis).getWord());
 					break;
 				case 2:
 					vprava = 2;
@@ -564,13 +501,14 @@ public class MainFormActivity extends GeneralMainActivity {
 					kilk[i] = 0;
 				}
 				Functions();
-			speaker.speakText(slovnik[0][k_zapis]);
+			speaker.speakText(allWordCards.get(k_zapis).getWord());
 			//}
 			break;
 		case REQUEST_CODE_SELECTDICT:
 			if (resultCode == RESULT_OK) {
 				vocab = data.getDataString();
-				loadDict(data.getData());
+				allWordCards = DictionaryFileManipulator.loadDictionaryByLines(data.getData(), getContentResolver());
+				startFunctions(data.getData());
 			}
 			break;
 
@@ -659,12 +597,12 @@ public class MainFormActivity extends GeneralMainActivity {
 			intent.setClass(MainFormActivity.this, WritingWordsActivity.class);
 			String[] vocab = new String[10];
 			for (int i = 0; i < 10; i++) {
-				vocab[i] = slovnik[0][i + startFromNumber];
+				vocab[i] = allWordCards.get(i + startFromNumber).getWord();
 			}
 			intent.putExtra(WritingWordsActivity.EXT_SLOVNIK1, vocab);
 			String[] vocab2 = new String[10];
 			for (int i = 0; i < 10; i++) {
-				vocab2[i] = slovnik[2][i + startFromNumber];
+				vocab2[i] = allWordCards.get(i + startFromNumber).getTranslation();
 			}
 			intent.putExtra(WritingWordsActivity.EXT_SLOVNIK3, vocab2);
 			intent.putExtra(WritingWordsActivity.EXT_KROK_POVTORY, krok_povtory);
@@ -685,7 +623,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			Functions();
 			// -----відтворення звуку-----
 			// if (jCheckBox1.isSelected()){
-			speaker.speakText(slovnik[0][k_zapis]);
+			speaker.speakText(allWordCards.get(k_zapis).getWord());
 			// }
 			// -------кінець відтворення звуку------
 		}
@@ -723,12 +661,12 @@ public class MainFormActivity extends GeneralMainActivity {
 			intent.setClass(MainFormActivity.this, WritingWordsActivity.class);
 			String[] vocab = new String[10];
 			for (int i = 0; i < 10; i++) {
-				vocab[i] = slovnik[0][i + startFromNumber];
+				vocab[i] = allWordCards.get(i + startFromNumber).getWord();
 			}
 			intent.putExtra(WritingWordsActivity.EXT_SLOVNIK1, vocab);
 			String[] vocab2 = new String[10];
 			for (int i = 0; i < 10; i++) {
-				vocab2[i] = slovnik[2][i + startFromNumber];
+				vocab2[i] = allWordCards.get(i + startFromNumber).getTranslation();
 			}
 			intent.putExtra(WritingWordsActivity.EXT_SLOVNIK3, vocab2);
 			intent.putExtra(WritingWordsActivity.EXT_KROK_POVTORY, krok_povtory);
@@ -965,7 +903,7 @@ public class MainFormActivity extends GeneralMainActivity {
 										kilk[i] = 0;
 									}
 									Functions();
-									speaker.speakText(slovnik[0][k_zapis]);
+									speaker.speakText(allWordCards.get(k_zapis).getWord());
 								} catch (Exception e) {
 									startFromNumber = oldStartFromNumber;
 									Toast toast = Toast
