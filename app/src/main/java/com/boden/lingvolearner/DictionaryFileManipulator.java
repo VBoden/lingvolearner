@@ -44,7 +44,6 @@ public class DictionaryFileManipulator {
 	public static List<WordCard> loadDictionaryByLines(Uri uri, ContentResolver contentResolver) {
 		List<WordCard> dictionary = new ArrayList<WordCard>();
 		boolean linesWithPercent = false;
-
 		StringBuilder stringBuilder = new StringBuilder();
 		try (InputStream inputStream = contentResolver.openInputStream(uri);
 				BufferedReader reader = new BufferedReader(

@@ -1,37 +1,35 @@
 package com.boden.lingvolearner;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.speech.tts.TextToSpeech;
+import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
 import java.util.Locale;
+
+import android.content.Context;
+import android.speech.tts.TextToSpeech;
 
 public class WordPlayerTTS implements WordPlayer, TextToSpeech.OnInitListener {
 
     private final Context context;
-    private final SharedPreferences settings;
 
     private TextToSpeech mTts;
 
-    public WordPlayerTTS(Context context, SharedPreferences settings) {
+    public WordPlayerTTS(Context context) {
         this.context = context;
-        this.settings = settings;
         init();
     }
 
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
-           // init();
+            init();
         } else {
             // Log.e(TAG, "Could not initialize TextToSpeech.");
         }
         // status =mTts.setEngineByPackageName("edu.cmu.cs.speech.tts.flite");
     }
 
-    @Override
-    public void init() {
-        int usedTts = settings.getInt(Constants.USED_TTS, 1);
+    private void init() {
+        int usedTts = getSettingsHolder().getUsedTts();
         if (usedTts == Constants.USE_GOOGLE_TTS) {
             mTts = new TextToSpeech(context, this);
         } else {
@@ -40,8 +38,7 @@ public class WordPlayerTTS implements WordPlayer, TextToSpeech.OnInitListener {
                         "edu.cmu.cs.speech.tts.flite");
             }
         }
-        String language = settings.getString(Constants.LANGUAGE, Locale.US.getLanguage());
-        updateLanguageSelection(language);
+        updateLanguageSelection(getSettingsHolder().getLanguage());
     }
 
     @Override

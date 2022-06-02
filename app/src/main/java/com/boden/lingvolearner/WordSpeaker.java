@@ -1,31 +1,23 @@
 package com.boden.lingvolearner;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.media.MediaPlayer;
+import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
 import java.io.File;
 import java.io.IOException;
 
-import static com.boden.lingvolearner.Constants.USE_TTS_TO_SAY;
+import com.boden.lingvolearner.services.ContextHolder;
+
+import android.media.MediaPlayer;
 
 public class WordSpeaker {
 
-    private final SharedPreferences settings;
-
-    private final WordPlayer mTts;
-
-    public WordSpeaker(Context context, SharedPreferences settings){
-        this.settings = settings;
-        mTts = new WordPlayerTTS(context, settings);
-    }
 
     public void speakText(String message) {
         System.out.println("=======speaking : "+message);
-        String pathToSoundFiles = settings.getString(Constants.PATH_TO_SOUND_FILES, "");
+        String pathToSoundFiles = getSettingsHolder().getPathToSoundFiles();
         String wordFilePath = pathToSoundFiles + message.charAt(0) + "/"
                 + message + ".wav";
-        boolean useFilesToSay = settings.getBoolean(Constants.USE_FILES_TO_SAY, true);
+        boolean useFilesToSay = getSettingsHolder().isUseFilesToSay();
         if (useFilesToSay) {
             MediaPlayer mediaPlayer = new MediaPlayer();
             try {
@@ -47,19 +39,23 @@ public class WordSpeaker {
             }
         }
         boolean filePlayed = useFilesToSay && (new File(wordFilePath)).exists();
-        boolean useTtsToSay = settings.getBoolean(USE_TTS_TO_SAY, true);
+        boolean useTtsToSay = getSettingsHolder().isUseTtsToSay();
         if (useTtsToSay && !filePlayed) {
-            mTts.playWord(message);
+            ContextHolder.getWordPlayer().playWord(message);
         }
     }
 
     public void updateLanguageSelection(String language) {
-        mTts.updateLanguageSelection(language);
+    	for(WordPlayer player : ContextHolder.getAllWordPlayer()) {
+    		player.updateLanguageSelection(language);
+    	}
     }
 
     public void destroy() {
-        if (mTts != null) {
-            mTts.destroy();
-        }
+    	for(WordPlayer player : ContextHolder.getAllWordPlayer()) {
+    		if (player != null) {
+    			player.destroy();
+    		}
+    	}
     }
 }
