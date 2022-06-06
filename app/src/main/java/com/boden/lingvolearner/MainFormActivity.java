@@ -46,7 +46,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-@TargetApi(14)
+@TargetApi(30)
 public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	private TextView Vword, Vtransc;
 	private ListView listView;
@@ -118,7 +118,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		// Log.i("DEBUG_INFO_MY", "now loaded settings");
 
 		boolean hasDict = false;
-		String vocab = ContextHolder.getSettingsHolder().getDict().getPath();
+		String vocab = Objects.nonNull(ContextHolder.getSettingsHolder().getDict()) ? ContextHolder.getSettingsHolder().getDict().getPath(): "";
 		if ((new File(vocab)).exists()) {
 			hasDict = loadDictionary(Uri.parse(vocab));
 		}
