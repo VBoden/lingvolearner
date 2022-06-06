@@ -1,6 +1,7 @@
 package com.boden.lingvolearner.services;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class ContextHolder {
 	private LearningManager learningManager;
 	private SettingsHolder settingsHolder;
 	private WordSpeaker wordSpeaker;
+	private WordPlayer player;
 
 	private ContextHolder() {
 		wordSpeaker = new WordSpeaker();
@@ -58,17 +60,30 @@ public class ContextHolder {
 	public static UiUpdator getUiUpdator(Stage stage) {
 		return STAGES_UI_UPDATORS.get(stage);
 	}
-	public static void registerWordPlayer(Stage stage, WordPlayer player) {
-		STAGES_PLAYER.put(stage, player);
-	}
-	
-	public static WordPlayer getWordPlayer() {
-		return STAGES_PLAYER.get(getLearningManager().getCurrentStage());
-	}
+//
+//	public static void registerWordPlayer(Stage stage, WordPlayer player) {
+//		STAGES_PLAYER.put(stage, player);
+//	}
+//	
+//	public static WordPlayer getWordPlayer() {
+//		return STAGES_PLAYER.get(getLearningManager().getCurrentStage());
+//	}
+//		
+//	public static Collection<WordPlayer> getAllWordPlayer() {
+//		return STAGES_PLAYER.values();
+//	}
+
+		public static void setWordPlayer(WordPlayer player) {
+			getInstance().player = player;
+		}
 		
-	public static Collection<WordPlayer> getAllWordPlayer() {
-		return STAGES_PLAYER.values();
-	}
+		public static WordPlayer getWordPlayer() {
+			return getInstance().player;
+		}
+			
+		public static Collection<WordPlayer> getAllWordPlayer() {
+			return Collections.singletonList(getInstance().player);
+		}
 
 	public static WordSpeaker getWordSpeaker() {
 		return getInstance().wordSpeaker;

@@ -94,8 +94,10 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		ContextHolder.registerUiUpdator(Stage.FOREIGN_TO_NATIVE, this);
 		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, this);
 		WordPlayerTTS player = new WordPlayerTTS(this);
-		ContextHolder.registerWordPlayer(Stage.FOREIGN_TO_NATIVE, player);
-		ContextHolder.registerWordPlayer(Stage.NATIVE_TO_FOREIGN, player);
+		ContextHolder.setWordPlayer(player);
+//		ContextHolder.registerWordPlayer(Stage.FOREIGN_TO_NATIVE, player);
+//		ContextHolder.registerWordPlayer(Stage.NATIVE_TO_FOREIGN, player);
+//		ContextHolder.registerWordPlayer(Stage.WRITING_WORDS, player);
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -106,7 +108,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 					Toast toast = Toast.makeText(context,
 							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
 							Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 				}
 
@@ -115,18 +117,10 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 		// Log.i("DEBUG_INFO_MY", "now loaded settings");
 
-//		speaker = new WordSpeaker();
-
 		boolean hasDict = false;
 		String vocab = ContextHolder.getSettingsHolder().getDict().getPath();
 		if ((new File(vocab)).exists()) {
-			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(Uri.parse(vocab), getContentResolver());
-			ContextHolder.getInstance().createLearningManager(allWordCards);
-			ContextHolder.getSettingsHolder().updateLastDictionary(Uri.parse(vocab));
-			getLearningManager().startLearning();
-//			speaker.speakText(getLearningManager().getCurrentCard().getWord());
-			// Log.i("DEBUG_INFO_MY", "finished loadDict");
-			hasDict = true;
+			hasDict = loadDictionary(Uri.parse(vocab));
 		}
 		if (!hasDict) {
 			startDictFileSelection();
@@ -174,33 +168,8 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	// *************************
 
 	private int getStartFromNumber() {
-		int startFromNumber = ContextHolder.getSettingsHolder().getStartFromNumber();
-		return startFromNumber;
+		return ContextHolder.getSettingsHolder().getStartFromNumber();
 	}
-
-//	public void setupNextWord() {
-//		int startFromNumber = getStartFromNumber();
-//		do {
-//			currentCartdNum = startFromNumber + rnd.nextInt(100) % 10;
-//		} while (kilk[currentCartdNum - startFromNumber] >= 1);
-//		Vword.setText(getLearningManager().getWordToDisplay());
-//		speaker.speakText(allWordCards.get(currentCartdNum).getWord());
-//		Vtransc.setText(getLearningManager().getWordTranscription());
-//	}
-
-//	public void Functions2_1() {
-//		// statusBar.setText("Переклад з української на англійську: слова "+slovnik[poch_nom][0]+"-"+slovnik[poch_nom
-//		// +9][0]+" ("+poch_nom+","+(poch_nom+9)+")");
-//		Vword.setText(getLearningManager().getWordToDisplay());
-//		Vtransc.setText(getLearningManager().getWordTranscription());
-//		// listView.setAdapter(new ArrayAdapter<String>(this,
-//		// android.R.layout.simple_list_item_1,
-//		// spisok2));
-//		// listView.setAdapter(new ArrayAdapter<String>(this,
-//		// R.layout.list_item,
-//		// spisok2));
-//		listSetAdapter();
-//	}
 
 	public void chooseAndFillNativeWord() {
 		Vword.setText(getLearningManager().getWordToDisplay());
@@ -228,16 +197,12 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 						Context context = getApplicationContext();
 						Toast toast = Toast.makeText(context, getResources().getString(R.string.end_of_dict),
 								Toast.LENGTH_SHORT);
-						toast.setGravity(Gravity.CENTER, 0, 0);
+//						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();
 					}
-//					speaker.speakText(getLearningManager().getCurrentCard().getWord());
 					break;
 				case 2:
 					getLearningManager().startPreviousStage();
-//					Vword.setText(getLearningManager().getWordToDisplay());
-//					Vtransc.setText(getLearningManager().getWordTranscription());
-//					listSetAdapter();
 					break;
 				case 3:
 					finish();
@@ -246,24 +211,33 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 			}
 			break;
 		case REQUEST_CODE_OPTION_ACTIVITY:
-			// if (resultCode == RESULT_OK) {
-
 			getLearningManager().startLearning();
-//				speaker.speakText(getLearningManager().getCurrentCard().getWord());
-			// }
 			break;
 		case REQUEST_CODE_SELECTDICT:
 			if (resultCode == RESULT_OK) {
-				getContentResolver().takePersistableUriPermission(data.getData(), 0);
-				allWordCards = DictionaryFileManipulator.loadDictionaryByLines(data.getData(), getContentResolver());
-				ContextHolder.getInstance().createLearningManager(allWordCards);
-				ContextHolder.getSettingsHolder().updateLastDictionary(data.getData());
-				getLearningManager().startLearning();
-//				speaker.speakText(getLearningManager().getCurrentCard().getWord());
+				loadDictionary(data.getData());
 			}
 			break;
 
 		}
+	}
+
+	private boolean loadDictionary(Uri uri) {
+		System.out.println("uri="+uri);
+		try {
+//			getContentResolver().takePersistableUriPermission(uri, 0);
+			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(uri, getContentResolver());
+			ContextHolder.getInstance().createLearningManager(allWordCards);
+			ContextHolder.getSettingsHolder().updateLastDictionary(uri);
+			getLearningManager().startLearning();
+		} catch (Exception e) {
+			e.printStackTrace();
+			Toast toast = Toast.makeText(getApplicationContext(), "Не вдалось відкрити словник!", Toast.LENGTH_SHORT);
+//			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+			return false;
+		}
+		return true;
 	}
 
 	@Override
@@ -309,7 +283,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		startActivityForResult(intent, REQUEST_CODE_OPTION_ACTIVITY);
 
 		System.out.println("setting closed");// ???????????
-//		speaker.updateLanguageSelection(ContextHolder.getSettingsHolder().getLanguage());
 	}
 
 	private void lastOpened() {
@@ -330,7 +303,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 	private void exit() {
 		Intent intent = new Intent();
-		// intent.putExtra(LingvistActivity.EXT_EX, "1");
 		setResult(RESULT_OK, intent);
 		finish();
 	}
@@ -354,18 +326,15 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 				float textSize = ContextHolder.getSettingsHolder().getTextSize();
 				if (textSize == 0) {
 					textSize = tv.getTextSize();
-//					ContextHolder.getSettingsHolder().setTextSize(textSize);
 				}
 				tv.setTextSize(textSize);
 				int textPadding = ContextHolder.getSettingsHolder().getTextPadding();
 				if (textPadding == 0) {
 					textPadding = tv.getPaddingBottom();
-//					ContextHolder.getSettingsHolder().setTextPadding(textPadding);
 				}
 				tv.setPadding(0, textPadding, 0, textPadding);
 				tv.setText(Html.fromHtml(getItem(position)));
-				tv.setGravity(Gravity.CENTER);
-				// tv.setText(getItem(position));
+//				tv.setGravity(Gravity.CENTER);
 
 				return row;
 			}
@@ -375,10 +344,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-		AdapterContextMenuInfo aMenuInfo = (AdapterContextMenuInfo) menuInfo;
-		// final int position = aMenuInfo.position;
-		// final AdapterData data = adapter.getItem(aMenuInfo.position);
-
 		menu.setHeaderTitle(R.string.parameters);
 		menu.add(R.string.smaller_size).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 			@Override
@@ -427,24 +392,14 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		switch (id) {
 		case IDD_SET_START_NUMBER:
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			// builder.setTitle("Редагування словника");
 			builder.setMessage(R.string.start_from_number);
 			final EditText inputStartNumber = new EditText(this);
 			inputStartNumber.setText("" + (getStartFromNumber() + 1));
 			inputStartNumber.setFocusable(true);
 			inputStartNumber.setInputType(InputType.TYPE_CLASS_NUMBER);
 			inputStartNumber.setSelection(inputStartNumber.getText().toString().length());
-			// inputStartNumber.requestFocusFromTouch();
 			builder.setView(inputStartNumber);
-			// final InputMethodManager inputMethodManager =
-			// (InputMethodManager)
-			// getSystemService(Context.INPUT_METHOD_SERVICE);
-			// if (inputMethodManager != null) {
-			// inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-			// 0);
-			// }
 
-			// inputStartNumber.requestFocus();
 			builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
 					String newStartNumber = inputStartNumber.getText().toString();
@@ -456,26 +411,20 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 							if (startFromNumber < 0) {
 								throw new Exception();
 							}
-							// Log.i("DEBUG_lAST", "startFromNumber="
-							// + startFromNumber);
+							// Log.i("DEBUG_lAST", "startFromNumber=" + startFromNumber);
 
 							ContextHolder.getSettingsHolder().updateStartNumber(startFromNumber);
 							getLearningManager().startLearning();
 
-//									speaker.speakText(getLearningManager().getCurrentCard().getWord());
 						} catch (Exception e) {
 							Toast toast = Toast.makeText(MainFormActivity.this,
 									getResources().getString(R.string.wrong_number), Toast.LENGTH_SHORT);
-							toast.setGravity(Gravity.CENTER, 0, 0);
+//							toast.setGravity(Gravity.CENTER, 0, 0);
 							toast.show();
 						}
 					}
-					// inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY,
-					// 0);
-					// saveChangedDictsList();
 					dialog.dismiss();
 					MainFormActivity.this.removeDialog(IDD_SET_START_NUMBER);
-					// return;
 				}
 			});
 			builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -492,7 +441,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	}
 
 	@Override
-	public void startLearningUpdateUI() {
+	public void updateUiOnNewPortionStarted() {
 		int startFromNumber = getStartFromNumber();
 		Context context = getApplicationContext();
 		Toast toast = Toast.makeText(context,
@@ -500,25 +449,20 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 						+ allWordCards.get(startFromNumber + 9).getWord() + " (" + (startFromNumber + 1) + "-"
 						+ (startFromNumber + 10) + ")",
 				Toast.LENGTH_SHORT);
-		toast.setGravity(Gravity.CENTER, 0, 0);
+//		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
-		// statusBar.setText("Переклад з англійської на українську: слова
-		// "+slovnik[poch_nom][0]+"-"+slovnik[poch_nom
-		// +9][0]+" ("+poch_nom+","+(poch_nom+9)+")");
 	}
 
 	@Override
 	public void updateWord() {
 		Vword.setText(getLearningManager().getWordToDisplay());
 		Vtransc.setText(getLearningManager().getWordTranscription());
-//		speaker.speakText(getLearningManager().getCurrentCard().getWord());
 	}
 
 	@Override
 	public void updateOnStageStart() {
 		Vword.setText(getLearningManager().getWordToDisplay());
 		Vtransc.setText(getLearningManager().getWordTranscription());
-//		speaker.speakText(getLearningManager().getCurrentCard().getWord());
 		listSetAdapter();
 		menu.getItem(0).setEnabled(getLearningManager().hasPreviousStep());
 	}

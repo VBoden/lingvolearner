@@ -79,7 +79,12 @@ public class SettingsHolder {
 	}
 
 	public void updateLastDictionary(Uri uri) {
-		String[] segments = uri.getLastPathSegment().split("/");
+		System.out.println("uri="+uri);
+		String[] segments = uri.getPath().split("/");
+		for (String segment : segments) {
+			System.out.println("segment="+segment);
+		}
+		System.out.println("==========");
 		Dict newDict = new Dict(uri.toString(), segments[segments.length - 1]);
 		if (listOfDicts.contains(newDict)) {
 			int index = listOfDicts.indexOf(newDict);

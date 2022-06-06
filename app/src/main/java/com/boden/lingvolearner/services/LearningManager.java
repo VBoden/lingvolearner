@@ -21,7 +21,6 @@ public class LearningManager {
 
 	private static final int WORDS_IN_CYCLE = 10;
 	private Stage currentStage;
-//	private AbstractStrategy currentStrategy;
 	private Map<Stage, AbstractStrategy> stagesStrategies;
 	private WordSpeaker speaker;
 
@@ -41,8 +40,6 @@ public class LearningManager {
 		createStagesMap();
 		currentStage = Stage.FOREIGN_TO_NATIVE;
 		repeatCount = getSettingsHolder().getRepeatCount();
-
-//		currentStrategy = getCurrentStrategy();
 	}
 
 	private void createStagesMap() {
@@ -62,8 +59,12 @@ public class LearningManager {
 
 	public void playOnClick() {
 		if (getCurrentStrategy().needPlayOnClick()) {
-			speaker.speakText(getCurrentCard().getWord());
+			speakCurrentWord();
 		}
+	}
+
+	private void speakCurrentWord() {
+		speaker.speakText(getCurrentCard().getWord());
 	}
 
 	public WordCard getCurrentCard() {
@@ -73,7 +74,6 @@ public class LearningManager {
 	public void startLearning() {
 		currentStage = Stage.getFirst();
 		startNewStage();
-		ContextHolder.getUiUpdator(currentStage).startLearningUpdateUI();
 	}
 
 	public void startNewStage() {
@@ -97,6 +97,7 @@ public class LearningManager {
 				startFrom = Math.min(startFrom + WORDS_IN_CYCLE, rozmir_mas - WORDS_IN_CYCLE);
 			}
 			ContextHolder.getSettingsHolder().updateStartNumber(startFrom);
+			ContextHolder.getUiUpdator(currentStage).updateUiOnNewPortionStarted();
 		}
 		if (currentStage.getNext().isLast()) {
 			ContextHolder.getUiUpdator(currentStage).createNewActivity();
@@ -111,6 +112,7 @@ public class LearningManager {
 			int startFrom = ContextHolder.getSettingsHolder().getStartFromNumber();
 			startFrom = Math.max(startFrom - WORDS_IN_CYCLE, 0);
 			ContextHolder.getSettingsHolder().updateStartNumber(startFrom);
+			ContextHolder.getUiUpdator(currentStage).updateUiOnNewPortionStarted();
 		}
 		if (currentStage.isFirst()) {
 			ContextHolder.getUiUpdator(currentStage).createNewActivity();
@@ -122,6 +124,14 @@ public class LearningManager {
 	public boolean checkAnswer(String answer) {
 		int startFrom = ContextHolder.getSettingsHolder().getStartFromNumber();
 		if (answer.equals(getCurrentStrategy().getWordToCheck(getCurrentCard()))) {
+			if (!getCurrentStrategy().needPlayOnClick()) {
+				speakCurrentWord();
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
 			k_zal_sliv--;
 			kilk[currentCartdNum - startFrom]++;
 			if (k_zal_sliv == 0) {
@@ -129,9 +139,7 @@ public class LearningManager {
 				resetCycle();
 			}
 			if (krok_povtory > 0) {
-//				setupNextWord();
-				changeCurrentCardNum();// !!!!!!!!!!
-				// here need update word on ui
+				changeCurrentCardNum();
 				ContextHolder.getUiUpdator(currentStage).updateWord();
 			} else {
 				if (currentStage.getNext().isLast()) {
@@ -156,6 +164,9 @@ public class LearningManager {
 		do {
 			currentCartdNum = startFromNumber + rnd.nextInt(100) % 10;
 		} while (kilk[currentCartdNum - startFromNumber] >= 1);
+		if (getCurrentStrategy().needPlayOnClick()) {
+			speakCurrentWord();
+		}
 	}
 
 	private int getStartFromNumber() {
@@ -193,6 +204,10 @@ public class LearningManager {
 
 	public Stage getCurrentStage() {
 		return currentStage;
+	}
+
+	public WordCard getWordCard(int index) {
+		return allWordCards.get(index);
 	}
 
 	public boolean hasPreviousStep() {
