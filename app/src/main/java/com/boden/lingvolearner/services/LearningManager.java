@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-import com.boden.lingvolearner.WordSpeaker;
 import com.boden.lingvolearner.pojo.WordCard;
 
 public class LearningManager {

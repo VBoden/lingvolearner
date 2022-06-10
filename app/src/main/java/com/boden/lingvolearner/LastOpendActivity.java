@@ -7,6 +7,7 @@ import java.util.List;
 //import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import com.boden.lingvolearner.pojo.Dict;
 import com.boden.lingvolearner.pojo.WordCard;
 import com.boden.lingvolearner.services.ContextHolder;
 

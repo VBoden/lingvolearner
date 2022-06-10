@@ -3,9 +3,8 @@ package com.boden.lingvolearner.services;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import com.boden.lingvolearner.Dict;
+import com.boden.lingvolearner.pojo.Dict;
 
-import android.content.SharedPreferences;
 import android.net.Uri;
 
 public class SettingsHolder {
@@ -19,7 +18,7 @@ public class SettingsHolder {
 	public static final String PATH_TO_SOUND_FILES = "pathToSoundFiles";
 	public static final String LANGUAGE = "ttsLanguage";
 
-	private SharedPreferences sharedPreferences;
+	private UserPreferences userPrefs;
 	private int textPadding;
 	private float textSize;
 	private int startFromNumber;
@@ -33,24 +32,24 @@ public class SettingsHolder {
 	private Dict dict;
 	private ArrayList<Dict> listOfDicts = new ArrayList<>();
 
-	public SettingsHolder(SharedPreferences sharedPreferences) {
-		this.sharedPreferences = sharedPreferences;
+	public SettingsHolder(UserPreferences userPrefs) {
+		this.userPrefs = userPrefs;
 		init();
 	}
 
 	private void init() {
-		textSize = sharedPreferences.getFloat(TEXT_SIZE, 0);
-		textPadding = sharedPreferences.getInt(TEXT_PADDING, 0);
-		repeatCount = sharedPreferences.getInt(REPEAT_COUNT, 5);
-		language = sharedPreferences.getString(LANGUAGE, Locale.US.getLanguage());
-		useTtsToSay = sharedPreferences.getBoolean(USE_TTS_TO_SAY, true);
-		usedTts = sharedPreferences.getInt(USED_TTS, 1);
-		useFilesToSay = sharedPreferences.getBoolean(USE_FILES_TO_SAY, true);
-		pathToSoundFiles = sharedPreferences.getString(PATH_TO_SOUND_FILES, "");
+		textSize = userPrefs.getFloat(TEXT_SIZE, 0);
+		textPadding = userPrefs.getInt(TEXT_PADDING, 0);
+		repeatCount = userPrefs.getInt(REPEAT_COUNT, 5);
+		language = userPrefs.getString(LANGUAGE, Locale.US.getLanguage());
+		useTtsToSay = userPrefs.getBoolean(USE_TTS_TO_SAY, true);
+		usedTts = userPrefs.getInt(USED_TTS, 1);
+		useFilesToSay = userPrefs.getBoolean(USE_FILES_TO_SAY, true);
+		pathToSoundFiles = userPrefs.getString(PATH_TO_SOUND_FILES, "");
 
 		getDictsFromSettings();
-		if (sharedPreferences.contains(DICTIONARIES) == true) {
-			String s = sharedPreferences.getString(DICTIONARIES, "");
+		if (userPrefs.contains(DICTIONARIES) == true) {
+			String s = userPrefs.getString(DICTIONARIES, "");
 			if (s.length() > 0) {
 				// Log.i("DEBUG_INFO_MY", "length>0");
 				dict = new Dict(s.substring(s.indexOf("<dict>") + 6, s.indexOf("</dict>")));
@@ -65,8 +64,8 @@ public class SettingsHolder {
 
 	private void getDictsFromSettings() {
 		// Log.i("DEBUG_LastOpend", "getted settings");
-		if (sharedPreferences.contains(DICTIONARIES) == true) {
-			String s = sharedPreferences.getString(DICTIONARIES, "");
+		if (userPrefs.contains(DICTIONARIES) == true) {
+			String s = userPrefs.getString(DICTIONARIES, "");
 			StringBuffer sb = new StringBuffer(s);
 			while (sb.length() > 0) {
 				Dict dict = new Dict(sb.substring(sb.indexOf("<dict>") + 6, sb.indexOf("</dict>")));
@@ -78,14 +77,14 @@ public class SettingsHolder {
 		}
 	}
 
-	public void updateLastDictionary(Uri uri) {
-		System.out.println("uri="+uri);
-		String[] segments = uri.getPath().split("/");
+	public void updateLastDictionary(String uriPath, String uriString) {
+		System.out.println("uri=" + uriString);
+		String[] segments = uriPath.split("/");
 		for (String segment : segments) {
-			System.out.println("segment="+segment);
+			System.out.println("segment=" + segment);
 		}
 		System.out.println("==========");
-		Dict newDict = new Dict(uri.toString(), segments[segments.length - 1]);
+		Dict newDict = new Dict(uriString, segments[segments.length - 1]);
 		if (listOfDicts.contains(newDict)) {
 			int index = listOfDicts.indexOf(newDict);
 			startFromNumber = listOfDicts.get(index).getBeginFrom();
@@ -107,10 +106,8 @@ public class SettingsHolder {
 			dictionaries.append(listOfDicts.get(i).toString());
 		}
 
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putString(DICTIONARIES, dictionaries.toString());
-		// Log.i("DEBUG_LastOpend", "saved dictionary: " + dictionaries.toString());
-		prefEditor.commit();
+		userPrefs.saveString(DICTIONARIES, dictionaries.toString());
+
 	}
 
 	public void updateStartNumber(int startFromNumber) {
@@ -133,9 +130,7 @@ public class SettingsHolder {
 	}
 
 	private void saveTextSize() {
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putFloat(TEXT_SIZE, textSize);
-		prefEditor.commit();
+		userPrefs.saveFloat(TEXT_SIZE, textSize);
 	}
 
 	public void decreaseTextPadding() {
@@ -149,9 +144,7 @@ public class SettingsHolder {
 	}
 
 	private void saveTextPadding() {
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putInt(TEXT_PADDING, textPadding);
-		prefEditor.commit();
+		userPrefs.saveInt(TEXT_PADDING, textPadding);
 	}
 
 	public boolean isUseFilesToSay() {
@@ -160,9 +153,8 @@ public class SettingsHolder {
 
 	public void setUseFilesToSay(boolean useFilesToSay) {
 		this.useFilesToSay = useFilesToSay;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putBoolean(USE_FILES_TO_SAY, useFilesToSay);
-		prefEditor.commit();
+		userPrefs.saveBoolean(USE_FILES_TO_SAY, useFilesToSay);
+
 	}
 
 	public boolean isUseTtsToSay() {
@@ -171,9 +163,7 @@ public class SettingsHolder {
 
 	public void setUseTtsToSay(boolean useTtsToSay) {
 		this.useTtsToSay = useTtsToSay;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putBoolean(USE_TTS_TO_SAY, useTtsToSay);
-		prefEditor.commit();
+		userPrefs.saveBoolean(USE_TTS_TO_SAY, useTtsToSay);
 	}
 
 	public String getPathToSoundFiles() {
@@ -182,13 +172,7 @@ public class SettingsHolder {
 
 	public void setPathToSoundFiles(String pathToSoundFiles) {
 		this.pathToSoundFiles = pathToSoundFiles;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putString(PATH_TO_SOUND_FILES, pathToSoundFiles);
-		prefEditor.commit();
-	}
-
-	public SharedPreferences getSharedPreferences() {
-		return sharedPreferences;
+		userPrefs.saveString(PATH_TO_SOUND_FILES, pathToSoundFiles);
 	}
 
 	public int getTextPadding() {
@@ -217,9 +201,7 @@ public class SettingsHolder {
 
 	public void setRepeatCount(int repeatCount) {
 		this.repeatCount = repeatCount;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putInt(REPEAT_COUNT, repeatCount);
-		prefEditor.commit();
+		userPrefs.saveInt(REPEAT_COUNT, repeatCount);
 	}
 
 	public Dict getDict() {
@@ -236,9 +218,7 @@ public class SettingsHolder {
 
 	public void setLanguage(String languageTag) {
 		language = languageTag;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putString(LANGUAGE, languageTag);
-		prefEditor.commit();
+		userPrefs.saveString(LANGUAGE, languageTag);
 	}
 
 	public int getUsedTts() {
@@ -247,9 +227,7 @@ public class SettingsHolder {
 
 	public void setUsedTts(int usedTts) {
 		this.usedTts = usedTts;
-		SharedPreferences.Editor prefEditor = sharedPreferences.edit();
-		prefEditor.putInt(USED_TTS, usedTts);
-		prefEditor.commit();
+		userPrefs.saveInt(USED_TTS, usedTts);
 	}
 
 }

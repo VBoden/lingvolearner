@@ -4,6 +4,8 @@ import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
 import java.util.Locale;
 
+import com.boden.lingvolearner.services.WordPlayer;
+
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 

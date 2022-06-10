@@ -77,11 +77,13 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		listView = (ListView) findViewById(R.id.list);
 		registerForContextMenu(listView);
 
-		ContextHolder.getInstance().createSettingsHolder(getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE));
+		ContextHolder.getInstance()
+				.createSettingsHolder(new UserPreferencesAdapter(getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE)));
 		ContextHolder.registerUiUpdator(Stage.FOREIGN_TO_NATIVE, this);
 		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, this);
 		WordPlayerTTS player = new WordPlayerTTS(this);
 		ContextHolder.setWordPlayer(player);
+		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -185,12 +187,13 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 		}
 	}
+
 	private boolean loadDictionary(Uri uri) {
-		System.out.println("uri="+uri);
+		System.out.println("uri=" + uri);
 		try {
 //			getContentResolver().takePersistableUriPermission(uri, 0);
 			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(uri, getContentResolver());
-			ContextHolder.getSettingsHolder().updateLastDictionary(uri);
+			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
 			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
 		} catch (Exception e) {
@@ -428,7 +431,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	@Override
 	public void createNewActivity() {
 		Intent intent = new Intent();
-		intent.setClass(MainFormActivity.this, WritingWordsActivity.class);
+		intent.setClass(this, WritingWordsActivity.class);
 		startActivityForResult(intent, REQUEST_CODE_FORM3_ACTIVITY);
 	}
 

@@ -1,4 +1,4 @@
-package com.boden.lingvolearner;
+package com.boden.lingvolearner.services;
 
 public interface WordPlayer {
 
