@@ -2,21 +2,12 @@ package com.boden.lingvolearner;
 
 import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 
-//import android.app.Activity;
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Random;
 
 import com.boden.lingvolearner.pojo.WordCard;
 import com.boden.lingvolearner.services.ContextHolder;
-import com.boden.lingvolearner.services.LearningManager;
 import com.boden.lingvolearner.services.Stage;
 import com.boden.lingvolearner.services.UiUpdator;
-
-//import com.vboden.lingvolearner.R;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -24,22 +15,18 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
-//import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -95,9 +82,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, this);
 		WordPlayerTTS player = new WordPlayerTTS(this);
 		ContextHolder.setWordPlayer(player);
-//		ContextHolder.registerWordPlayer(Stage.FOREIGN_TO_NATIVE, player);
-//		ContextHolder.registerWordPlayer(Stage.NATIVE_TO_FOREIGN, player);
-//		ContextHolder.registerWordPlayer(Stage.WRITING_WORDS, player);
 
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
@@ -108,7 +92,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 					Toast toast = Toast.makeText(context,
 							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
 							Toast.LENGTH_SHORT);
-//					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 				}
 
@@ -117,14 +100,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 		// Log.i("DEBUG_INFO_MY", "now loaded settings");
 
-		boolean hasDict = false;
-		String vocab = Objects.nonNull(ContextHolder.getSettingsHolder().getDict()) ? ContextHolder.getSettingsHolder().getDict().getPath(): "";
-		if ((new File(vocab)).exists()) {
-			hasDict = loadDictionary(Uri.parse(vocab));
-		}
-		if (!hasDict) {
-			startDictFileSelection();
-		}
+		startDictFileSelection();
 
 	}
 
@@ -132,15 +108,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
 		intent.setType("*/*");
-
-//		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//		intent.addCategory(Intent.CATEGORY_OPENABLE);
-//		intent.setType("file/*");
-//		intent.putExtra(Intent.EXTRA_MIME_TYPES, Collections.singletonList("application/vcb").toArray());
-
-		// Optionally, specify a URI for the file that should appear in the
-		// system file picker when it loads.
-//			intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
 		try {
 			startActivityForResult(intent, REQUEST_CODE_SELECTDICT);
 		} catch (Exception e) {
@@ -164,8 +131,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		ContextHolder.getWordSpeaker().destroy();
 		super.onDestroy();
 	}
-
-	// *************************
 
 	private int getStartFromNumber() {
 		return ContextHolder.getSettingsHolder().getStartFromNumber();
@@ -197,7 +162,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 						Context context = getApplicationContext();
 						Toast toast = Toast.makeText(context, getResources().getString(R.string.end_of_dict),
 								Toast.LENGTH_SHORT);
-//						toast.setGravity(Gravity.CENTER, 0, 0);
 						toast.show();
 					}
 					break;
@@ -221,19 +185,17 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 		}
 	}
-
 	private boolean loadDictionary(Uri uri) {
 		System.out.println("uri="+uri);
 		try {
 //			getContentResolver().takePersistableUriPermission(uri, 0);
 			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(uri, getContentResolver());
-			ContextHolder.getInstance().createLearningManager(allWordCards);
 			ContextHolder.getSettingsHolder().updateLastDictionary(uri);
+			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Toast toast = Toast.makeText(getApplicationContext(), "Не вдалось відкрити словник!", Toast.LENGTH_SHORT);
-//			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();
 			return false;
 		}
@@ -334,8 +296,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 				}
 				tv.setPadding(0, textPadding, 0, textPadding);
 				tv.setText(Html.fromHtml(getItem(position)));
-//				tv.setGravity(Gravity.CENTER);
-
 				return row;
 			}
 		};
@@ -419,7 +379,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 						} catch (Exception e) {
 							Toast toast = Toast.makeText(MainFormActivity.this,
 									getResources().getString(R.string.wrong_number), Toast.LENGTH_SHORT);
-//							toast.setGravity(Gravity.CENTER, 0, 0);
 							toast.show();
 						}
 					}
@@ -449,7 +408,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 						+ allWordCards.get(startFromNumber + 9).getWord() + " (" + (startFromNumber + 1) + "-"
 						+ (startFromNumber + 10) + ")",
 				Toast.LENGTH_SHORT);
-//		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 	}
 
@@ -472,5 +430,10 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		Intent intent = new Intent();
 		intent.setClass(MainFormActivity.this, WritingWordsActivity.class);
 		startActivityForResult(intent, REQUEST_CODE_FORM3_ACTIVITY);
+	}
+
+	@Override
+	public void updateOnStageEnd() {
+		// TODO Auto-generated method stub
 	}
 }

@@ -1,6 +1,5 @@
 package com.boden.lingvolearner.services;
 
-import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
 import java.util.HashMap;
@@ -9,16 +8,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 
-import com.boden.lingvolearner.MainFormActivity;
 import com.boden.lingvolearner.WordSpeaker;
 import com.boden.lingvolearner.pojo.WordCard;
 
-import android.content.Context;
-import android.view.Gravity;
-import android.widget.Toast;
-
 public class LearningManager {
 
+	private static final int SLEEP_TIME = 900;
 	private static final int WORDS_IN_CYCLE = 10;
 	private Stage currentStage;
 	private Map<Stage, AbstractStrategy> stagesStrategies;
@@ -127,7 +122,7 @@ public class LearningManager {
 			if (!getCurrentStrategy().needPlayOnClick()) {
 				speakCurrentWord();
 				try {
-					Thread.sleep(500);
+					Thread.sleep(SLEEP_TIME);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -145,15 +140,12 @@ public class LearningManager {
 				if (currentStage.getNext().isLast()) {
 					ContextHolder.getUiUpdator(currentStage).createNewActivity();
 				}
+				ContextHolder.getUiUpdator(currentStage).updateOnStageEnd();
 				startNextStage();
-				// jButton13.setEnabled(true);
-//				Functions2_1();
-				// need update full ui or start new activity for writing
 			}
 		} else {
 			k_zal_sliv++;
 			kilk[currentCartdNum - startFrom]--;
-			// showDialog(0);
 			return false;
 		}
 		return true;

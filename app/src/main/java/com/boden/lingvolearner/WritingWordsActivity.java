@@ -53,7 +53,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 					Toast toast = Toast.makeText(context,
 							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
 							Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();
 				}
 			}
@@ -63,7 +62,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 
 	@Override
 	public void onDestroy() {
-		ContextHolder.getWordSpeaker().destroy();
 		super.onDestroy();
 	}
 
@@ -95,7 +93,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 			intent.putExtra(MainFormActivity.EXT_RESULT, "1");
 			setResult(RESULT_OK, intent);
 			finish();
-//			getLearningManager().startNextStage();
 			break;
 
 		case IDM_PREVIOUS:
@@ -103,7 +100,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 			intent.putExtra(MainFormActivity.EXT_RESULT, "2");
 			setResult(RESULT_OK, intent);
 			finish();
-//			getLearningManager().startPreviousStage();
 			break;
 		case IDM_HELP:
 			intent = new Intent();
@@ -141,7 +137,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 						+ "-" + getLearningManager().getWordCard(startFromNumber + 9).getWord() + " ("
 						+ (startFromNumber + 1) + "-" + (startFromNumber + 10) + ")",
 				Toast.LENGTH_SHORT);
-//		toast.setGravity(Gravity.CENTER, 0, 0);
 		toast.show();
 	}
 
@@ -155,6 +150,11 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 		Intent intent = new Intent();
 		intent.putExtra(MainFormActivity.EXT_RESULT, "1");
 		setResult(RESULT_OK, intent);
+		finish();
+	}
+
+	@Override
+	public void updateOnStageEnd() {
 		finish();
 	}
 }

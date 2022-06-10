@@ -6,6 +6,8 @@ public interface UiUpdator {
 	void updateUiOnNewPortionStarted();
 
 	void updateOnStageStart();
-	
+
+	void updateOnStageEnd();
+
 	void createNewActivity();
 }
