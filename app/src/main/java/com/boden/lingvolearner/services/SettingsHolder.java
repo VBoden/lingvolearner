@@ -5,8 +5,6 @@ import java.util.Locale;
 
 import com.boden.lingvolearner.pojo.Dict;
 
-import android.net.Uri;
-
 public class SettingsHolder {
 	public static final String REPEAT_COUNT = "repeatCount";
 	public static final String DICTIONARIES = "dictionaries";

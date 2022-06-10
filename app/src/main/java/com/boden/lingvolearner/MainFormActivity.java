@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.boden.lingvolearner.pojo.WordCard;
 import com.boden.lingvolearner.services.ContextHolder;
+import com.boden.lingvolearner.services.DictionaryFileManipulator;
 import com.boden.lingvolearner.services.Stage;
 import com.boden.lingvolearner.services.UiUpdator;
 
@@ -192,7 +193,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		System.out.println("uri=" + uri);
 		try {
 //			getContentResolver().takePersistableUriPermission(uri, 0);
-			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(uri, getContentResolver());
+			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(getContentResolver().openInputStream(uri));
 			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
 			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
