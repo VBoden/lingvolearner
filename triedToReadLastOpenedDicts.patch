@@ -1,0 +1,247 @@
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+index a289829..55f5809 100644
+--- a/app/src/main/AndroidManifest.xml
++++ b/app/src/main/AndroidManifest.xml
+@@ -4,6 +4,8 @@
+     android:requestLegacyExternalStorage="true"
+     android:versionCode="3"
+     android:versionName="2.1">
++    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
++    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+     <queries>
+         <intent>
+             <action android:name="android.intent.action.TTS_SERVICE"/>
+@@ -14,7 +16,7 @@
+         android:allowBackup="true"
+         android:icon="@drawable/ic_launcher"
+         android:label="@string/app_name"
+-        android:theme="@style/AppTheme">
++        android:theme="@style/AppTheme"  android:requestLegacyExternalStorage="true">
+ 
+ 
+         <activity
+diff --git a/app/src/main/java/com/boden/lingvolearner/DictionaryFileManipulator.java b/app/src/main/java/com/boden/lingvolearner/DictionaryFileManipulator.java
+index 299607c..647db75 100644
+--- a/app/src/main/java/com/boden/lingvolearner/DictionaryFileManipulator.java
++++ b/app/src/main/java/com/boden/lingvolearner/DictionaryFileManipulator.java
+@@ -1,6 +1,8 @@
+ package com.boden.lingvolearner;
+ 
+ import java.io.BufferedReader;
++import java.io.File;
++import java.io.FileInputStream;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.io.InputStreamReader;
+@@ -66,6 +68,34 @@ public class DictionaryFileManipulator {
+ 		return dictionary;
+ 	}
+ 
++	public static List<WordCard> loadDictionaryByLines(String path) {
++		List<WordCard> dictionary = new ArrayList<WordCard>();
++		boolean linesWithPercent = false;
++//		FileInputStream iFile = new FileInputStream(new File(path));
++//					String strLine = null;
++//		
++//					InputStreamReader tmp = new InputStreamReader(iFile, "UTF8");
++		StringBuilder stringBuilder = new StringBuilder();
++		try (InputStream inputStream = new FileInputStream(new File(path));
++				BufferedReader reader = new BufferedReader(
++						new InputStreamReader(Objects.requireNonNull(inputStream), "UTF8"))) {
++			String line;
++			while ((line = reader.readLine()) != null) {
++				if (line.contains("%") || linesWithPercent) {
++					linesWithPercent = true;
++					stringBuilder.append(line);
++				} else {
++					addWordsToDictionary(dictionary, line, PATTERN_WITHOUT_PERCENT);
++				}
++			}
++			if (linesWithPercent) {
++				addWordsToDictionary(dictionary, stringBuilder.toString(), PATTERN_WITH_PERCENT);
++			}
++		} catch (IOException e) {
++			e.printStackTrace();
++		}
++		return dictionary;
++	}
+ 	private static void addWordsToDictionary(List<WordCard> dictionary, String line, Pattern pattern) {
+ 		Matcher matcher = pattern.matcher(line);
+ 		WordCard word;
+diff --git a/app/src/main/java/com/boden/lingvolearner/MainFormActivity.java b/app/src/main/java/com/boden/lingvolearner/MainFormActivity.java
+index 38468dc..87a3b62 100644
+--- a/app/src/main/java/com/boden/lingvolearner/MainFormActivity.java
++++ b/app/src/main/java/com/boden/lingvolearner/MainFormActivity.java
+@@ -119,9 +119,15 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
+ 
+ 		boolean hasDict = false;
+ 		String vocab = Objects.nonNull(ContextHolder.getSettingsHolder().getDict()) ? ContextHolder.getSettingsHolder().getDict().getPath(): "";
+-		if ((new File(vocab)).exists()) {
+-			hasDict = loadDictionary(Uri.parse(vocab));
+-		}
++//		if(vocab.length()>0) {
++//		String segment = Uri.parse(vocab).getPathSegments().get(1);
++//		String[] split = segment.split(":");
++//		if ((new File("/storage/"+split[0]+"/"+split[1])).exists()) {
++//			String path = (new File("/storage/"+split[0]+"/"+split[1])).getPath();
++//			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(path);
++//			hasDict = loadDictionary(Uri.parse(vocab),false);
++//		}
++//		}
+ 		if (!hasDict) {
+ 			startDictFileSelection();
+ 		}
+@@ -221,14 +227,21 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
+ 
+ 		}
+ 	}
+-
+ 	private boolean loadDictionary(Uri uri) {
++		return loadDictionary(uri, true);
++	}
++	private boolean loadDictionary(Uri uri, boolean load) {
+ 		System.out.println("uri="+uri);
+ 		try {
++//			final int takeFlags = this.getIntent().getFlags()
++//					& (Intent.FLAG_GRANT_READ_URI_PERMISSION
++//					| Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+ //			getContentResolver().takePersistableUriPermission(uri, 0);
++			if(load) {
+ 			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(uri, getContentResolver());
+-			ContextHolder.getInstance().createLearningManager(allWordCards);
+ 			ContextHolder.getSettingsHolder().updateLastDictionary(uri);
++			}
++			ContextHolder.getInstance().createLearningManager(allWordCards);
+ 			getLearningManager().startLearning();
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+@@ -473,4 +486,9 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
+ 		intent.setClass(MainFormActivity.this, WritingWordsActivity.class);
+ 		startActivityForResult(intent, REQUEST_CODE_FORM3_ACTIVITY);
+ 	}
++
++	@Override
++	public void updateOnStageEnd() {
++		// TODO Auto-generated method stub
++	}
+ }
+diff --git a/app/src/main/java/com/boden/lingvolearner/WritingWordsActivity.java b/app/src/main/java/com/boden/lingvolearner/WritingWordsActivity.java
+index c54bb61..8aea886 100644
+--- a/app/src/main/java/com/boden/lingvolearner/WritingWordsActivity.java
++++ b/app/src/main/java/com/boden/lingvolearner/WritingWordsActivity.java
+@@ -53,7 +53,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 					Toast toast = Toast.makeText(context,
+ 							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
+ 							Toast.LENGTH_SHORT);
+-					toast.setGravity(Gravity.CENTER, 0, 0);
+ 					toast.show();
+ 				}
+ 			}
+@@ -63,7 +62,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 
+ 	@Override
+ 	public void onDestroy() {
+-		ContextHolder.getWordSpeaker().destroy();
+ 		super.onDestroy();
+ 	}
+ 
+@@ -95,7 +93,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 			intent.putExtra(MainFormActivity.EXT_RESULT, "1");
+ 			setResult(RESULT_OK, intent);
+ 			finish();
+-//			getLearningManager().startNextStage();
+ 			break;
+ 
+ 		case IDM_PREVIOUS:
+@@ -103,7 +100,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 			intent.putExtra(MainFormActivity.EXT_RESULT, "2");
+ 			setResult(RESULT_OK, intent);
+ 			finish();
+-//			getLearningManager().startPreviousStage();
+ 			break;
+ 		case IDM_HELP:
+ 			intent = new Intent();
+@@ -141,7 +137,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 						+ "-" + getLearningManager().getWordCard(startFromNumber + 9).getWord() + " ("
+ 						+ (startFromNumber + 1) + "-" + (startFromNumber + 10) + ")",
+ 				Toast.LENGTH_SHORT);
+-//		toast.setGravity(Gravity.CENTER, 0, 0);
+ 		toast.show();
+ 	}
+ 
+@@ -157,4 +152,9 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
+ 		setResult(RESULT_OK, intent);
+ 		finish();
+ 	}
++
++	@Override
++	public void updateOnStageEnd() {
++		finish();
++	}
+ }
+diff --git a/app/src/main/java/com/boden/lingvolearner/services/LearningManager.java b/app/src/main/java/com/boden/lingvolearner/services/LearningManager.java
+index baa5370..e2979ee 100644
+--- a/app/src/main/java/com/boden/lingvolearner/services/LearningManager.java
++++ b/app/src/main/java/com/boden/lingvolearner/services/LearningManager.java
+@@ -1,6 +1,5 @@
+ package com.boden.lingvolearner.services;
+ 
+-import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
+ import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
+ 
+ import java.util.HashMap;
+@@ -9,14 +8,9 @@ import java.util.Map;
+ import java.util.Objects;
+ import java.util.Random;
+ 
+-import com.boden.lingvolearner.MainFormActivity;
+ import com.boden.lingvolearner.WordSpeaker;
+ import com.boden.lingvolearner.pojo.WordCard;
+ 
+-import android.content.Context;
+-import android.view.Gravity;
+-import android.widget.Toast;
+-
+ public class LearningManager {
+ 
+ 	private static final int WORDS_IN_CYCLE = 10;
+@@ -127,7 +121,7 @@ public class LearningManager {
+ 			if (!getCurrentStrategy().needPlayOnClick()) {
+ 				speakCurrentWord();
+ 				try {
+-					Thread.sleep(500);
++					Thread.sleep(1000);
+ 				} catch (InterruptedException e) {
+ 					e.printStackTrace();
+ 				}
+@@ -145,15 +139,12 @@ public class LearningManager {
+ 				if (currentStage.getNext().isLast()) {
+ 					ContextHolder.getUiUpdator(currentStage).createNewActivity();
+ 				}
++				ContextHolder.getUiUpdator(currentStage).updateOnStageEnd();
+ 				startNextStage();
+-				// jButton13.setEnabled(true);
+-//				Functions2_1();
+-				// need update full ui or start new activity for writing
+ 			}
+ 		} else {
+ 			k_zal_sliv++;
+ 			kilk[currentCartdNum - startFrom]--;
+-			// showDialog(0);
+ 			return false;
+ 		}
+ 		return true;
+diff --git a/app/src/main/java/com/boden/lingvolearner/services/UiUpdator.java b/app/src/main/java/com/boden/lingvolearner/services/UiUpdator.java
+index 40cae59..e465aaf 100644
+--- a/app/src/main/java/com/boden/lingvolearner/services/UiUpdator.java
++++ b/app/src/main/java/com/boden/lingvolearner/services/UiUpdator.java
+@@ -6,6 +6,8 @@ public interface UiUpdator {
+ 	void updateUiOnNewPortionStarted();
+ 
+ 	void updateOnStageStart();
+-	
++
++	void updateOnStageEnd();
++
+ 	void createNewActivity();
+ }
