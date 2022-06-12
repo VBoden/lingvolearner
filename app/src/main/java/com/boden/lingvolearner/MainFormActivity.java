@@ -174,6 +174,8 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 				case 3:
 					finish();
 					break;
+				case 10:
+					break;
 				}
 			}
 			break;

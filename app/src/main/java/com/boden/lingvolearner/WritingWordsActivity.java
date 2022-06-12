@@ -155,6 +155,9 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 
 	@Override
 	public void updateOnStageEnd() {
+		Intent intent = new Intent();
+		intent.putExtra(MainFormActivity.EXT_RESULT, "10");
+		setResult(RESULT_OK, intent);
 		finish();
 	}
 }
