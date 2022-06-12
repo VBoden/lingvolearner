@@ -2,6 +2,9 @@ package com.boden.lingvolearner;
 
 import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 import com.boden.lingvolearner.pojo.WordCard;
@@ -42,18 +45,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 	private List<WordCard> allWordCards;
 
-	public static final String EXT_NAME_VOC = "voc_name";
-	public static final String EXT_POCH_NOM = "poch_nom";
-	public static final String EXT_KILK_POVT = "kilk_povt";
 	public static final String EXT_RESULT = "result";
-
-	public static final int IDM_OPEN = 101;
-	public static final int IDM_NEXT = 102;
-	public static final int IDM_PREVIOUS = 103;
-	public static final int IDM_OPTIONS = 104;
-	public static final int IDM_HELP = 105;
-	public static final int IDM_EXIT = 106;
-	public static final int IDM_LASTOPEND = 107;
 
 	private static final int REQUEST_CODE_FORM3_ACTIVITY = 1;
 	private static final int REQUEST_CODE_OPTION_ACTIVITY = 2;
@@ -224,6 +216,9 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		case R.id.menu_help:
 			help();
 			return true;
+		case R.id.menu_dict_preview:
+			previewWholeDcitionary();
+			return true;
 		case R.id.menu_last_opend:
 			lastOpened();
 			return true;
@@ -266,7 +261,45 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	private void help() {
 		Intent intent = new Intent();
 		intent.setClass(MainFormActivity.this, HelpActivity.class);
+		intent.putExtra(HelpActivity.CONTENT, getHelpFileContent());
 		startActivity(intent);
+	}
+
+	private String getHelpFileContent() {
+		InputStream iFile;
+		String s;
+		try {
+			iFile = getResources().openRawResource(R.raw.help);
+			InputStreamReader tmp = new InputStreamReader(iFile, "UTF8");
+			BufferedReader dataIO = new BufferedReader(tmp);
+			StringBuffer sBuffer = new StringBuffer();
+			String strLine = null;
+			while ((strLine = dataIO.readLine()) != null) {
+				sBuffer.append(strLine);
+			}
+			dataIO.close();
+			iFile.close();
+			s = sBuffer.toString();
+		} catch (Exception e) {
+			s =getResources().getString(R.string.coud_not_open_help);
+		}
+		return s;
+	}
+
+	private void previewWholeDcitionary() {
+		Intent intent = new Intent();
+		intent.setClass(MainFormActivity.this, HelpActivity.class);
+		intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
+		startActivity(intent);
+	}
+
+	private String getDictViewContent() {
+		StringBuilder sb = new StringBuilder("<ol>");
+		allWordCards.forEach(card -> {
+			sb.append("<li>"+card.toString()+"</li>");
+		});
+		sb.append("</ol>");
+		return sb.toString();
 	}
 
 	private void exit() {

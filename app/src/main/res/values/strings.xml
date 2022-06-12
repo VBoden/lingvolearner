@@ -15,6 +15,7 @@
     <string name="next_step">"Наступний етап"</string>
     <string name="last_opend">"Недавно відкриті"</string>
     <string name="help">"Допомога"</string>
+    <string name="dict_preview">"Перегляд словника"</string>
     <string name="exit">"Вийти"</string>
     <string name="parameters">"Параметри відображення"</string>
     <string name="smaller_size">"Зменшити шрифт"</string>
