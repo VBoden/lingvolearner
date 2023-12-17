@@ -1,10 +1,6 @@
 package com.boden.lingvolearner;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,7 +8,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.boden.lingvolearner.services.ContextHolder;
-import com.boden.lingvolearner.services.Stage;
 import com.boden.lingvolearner.services.UiUpdator;
 
 import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
@@ -64,19 +59,11 @@ public class WritingWordsUiUpdator implements UiUpdator {
 			}
 		});
 		updateOnStageStart();
-//		Intent intent = new Intent();
-//		intent.putExtra(MainFormActivity.EXT_RESULT, "1");
-//		setResult(RESULT_OK, intent);
-//		finish();
 	}
 
 	@Override
 	public void updateOnStageEnd() {
 		ContextHolder.getUiUpdator(ContextHolder.getLearningManager().getCurrentStage().getNext()).createNewActivity();
-//		Intent intent = new Intent();
-//		intent.putExtra(MainFormActivity.EXT_RESULT, "10");
-//		setResult(RESULT_OK, intent);
-//		finish();
 	}
 
 	@Override
