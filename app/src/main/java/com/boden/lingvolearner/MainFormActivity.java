@@ -81,15 +81,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
-				boolean isCorrect = getLearningManager().checkAnswer(getLearningManager().getWordChoices()[position]);
-				if (!isCorrect) {
-					Context context = MainFormActivity.this.getApplicationContext();
-					Toast toast = Toast.makeText(context,
-							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
-							Toast.LENGTH_SHORT);
-					toast.show();
-				}
-
+				getLearningManager().checkAnswer(getLearningManager().getWordChoices()[position]);
 			}
 		});
 
@@ -281,7 +273,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 			iFile.close();
 			s = sBuffer.toString();
 		} catch (Exception e) {
-			s =getResources().getString(R.string.coud_not_open_help);
+			s = getResources().getString(R.string.coud_not_open_help);
 		}
 		return s;
 	}
@@ -296,7 +288,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	private String getDictViewContent() {
 		StringBuilder sb = new StringBuilder("<ol>");
 		allWordCards.forEach(card -> {
-			sb.append("<li>"+card.toString()+"</li>");
+			sb.append("<li>" + card.toString() + "</li>");
 		});
 		sb.append("</ol>");
 		return sb.toString();
@@ -474,5 +466,12 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	@Override
 	public void updateOnStageEnd() {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void showHint(String word, String answer) {
+		Context context = MainFormActivity.this.getApplicationContext();
+		Toast toast = Toast.makeText(context, word + " - " + answer, Toast.LENGTH_SHORT);
+		toast.show();
 	}
 }

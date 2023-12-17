@@ -37,7 +37,6 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		ContextHolder.registerUiUpdator(Stage.WRITING_WORDS, this);
-//		ContextHolder.registerWordPlayer(Stage.WRITING_WORDS, new WordPlayerTTS(this));
 		setContentView(R.layout.form3);
 
 		Vword = (TextView) findViewById(R.id.word3);
@@ -46,15 +45,7 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 		final Button button1 = (Button) findViewById(R.id.but0);
 		button1.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-
-				boolean isCorrect = ContextHolder.getLearningManager().checkAnswer(Venword.getText().toString());
-				if (!isCorrect) {
-					Context context = getApplicationContext();
-					Toast toast = Toast.makeText(context,
-							getLearningManager().getWordToDisplay() + " - " + getLearningManager().getWordAnswer(),
-							Toast.LENGTH_SHORT);
-					toast.show();
-				}
+				ContextHolder.getLearningManager().checkAnswer(Venword.getText().toString());
 			}
 		});
 		updateOnStageStart();
@@ -159,5 +150,12 @@ public class WritingWordsActivity extends GeneralMainActivity implements UiUpdat
 		intent.putExtra(MainFormActivity.EXT_RESULT, "10");
 		setResult(RESULT_OK, intent);
 		finish();
+	}
+
+	@Override
+	public void showHint(String word, String answer) {
+		Context context = getApplicationContext();
+		Toast toast = Toast.makeText(context, word + " - " + answer, Toast.LENGTH_SHORT);
+		toast.show();
 	}
 }
