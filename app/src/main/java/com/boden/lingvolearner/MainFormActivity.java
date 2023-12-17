@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,11 +40,13 @@ import android.widget.Toast;
 
 @TargetApi(30)
 public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
-	private TextView Vword, Vtransc;
+	private TextView Vtransc;
+	private TextView Vword;
+	private EditText Venword;
 	private ListView listView;
 	private Menu menu;
 
-	private List<WordCard> allWordCards;
+//	private List<WordCard> allWordCards;
 
 	public static final String EXT_RESULT = "result";
 
@@ -54,42 +57,57 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 	private static final int IDD_SET_START_NUMBER = 1;
 
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_form);
 		setTitle(R.string.app_name2);
+		MainFormUiUpdator mainFormUiUpdator = new MainFormUiUpdator(this);
+		ContextHolder.registerUiUpdator(Stage.FOREIGN_TO_NATIVE, mainFormUiUpdator);
+		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, mainFormUiUpdator);
+		ContextHolder.registerUiUpdator(Stage.WRITING_WORDS, new WritingWordsUiUpdator(this));
 
-		Vword = (TextView) findViewById(R.id.word);
-		Vword.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				getLearningManager().playOnClick();
-			}
-		});
-		Vtransc = (TextView) findViewById(R.id.transcription);
-		listView = (ListView) findViewById(R.id.list);
-		registerForContextMenu(listView);
+		ContextHolder.getUiUpdator(Stage.FOREIGN_TO_NATIVE).createNewActivity();
+
+//		Vword = (TextView) findViewById(R.id.word);
+//		Vword.setOnClickListener(new View.OnClickListener() {
+//			public void onClick(View v) {
+//				getLearningManager().playOnClick();
+//			}
+//		});
+//		Vtransc = (TextView) findViewById(R.id.transcription);
+//		listView = (ListView) findViewById(R.id.list);
+//		registerForContextMenu(listView);
 
 		ContextHolder.getInstance()
 				.createSettingsHolder(new UserPreferencesAdapter(getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE)));
-		ContextHolder.registerUiUpdator(Stage.FOREIGN_TO_NATIVE, this);
-		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, this);
+//		ContextHolder.registerUiUpdator(Stage.FOREIGN_TO_NATIVE, this);
+//		ContextHolder.registerUiUpdator(Stage.NATIVE_TO_FOREIGN, this);
+//		ContextHolder.registerUiUpdator(Stage.WRITING_WORDS, this);
 		WordPlayerTTS player = new WordPlayerTTS(this);
 		ContextHolder.setWordPlayer(player);
 		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
-				getLearningManager().checkAnswer(getLearningManager().getWordChoices()[position]);
-			}
-		});
+//		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//			@Override
+//			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
+//				getLearningManager().checkAnswer(getLearningManager().getWordChoices()[position]);
+//			}
+//		});
 
 		// Log.i("DEBUG_INFO_MY", "now loaded settings");
 
 		startDictFileSelection();
 
 	}
+	
+
+	public Menu getMenu() {
+		return menu;
+	}
+
+
 
 	private void startDictFileSelection() {
 		Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -131,38 +149,6 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-		case REQUEST_CODE_FORM3_ACTIVITY:
-			if (resultCode == RESULT_OK) {
-				Bundle extras = data.getExtras();
-				int result = Integer.parseInt(extras.getString(EXT_RESULT));
-
-				switch (result) {
-				case 0:
-					Intent intent = new Intent();
-					setResult(RESULT_OK, intent);
-					finish();
-					break;
-				case 1:
-
-					boolean endReached = getLearningManager().startNextStage();
-					if (endReached) {
-						Context context = getApplicationContext();
-						Toast toast = Toast.makeText(context, getResources().getString(R.string.end_of_dict),
-								Toast.LENGTH_SHORT);
-						toast.show();
-					}
-					break;
-				case 2:
-					getLearningManager().startPreviousStage();
-					break;
-				case 3:
-					finish();
-					break;
-				case 10:
-					break;
-				}
-			}
-			break;
 		case REQUEST_CODE_OPTION_ACTIVITY:
 			getLearningManager().startLearning();
 			break;
@@ -179,7 +165,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		System.out.println("uri=" + uri);
 		try {
 //			getContentResolver().takePersistableUriPermission(uri, 0);
-			allWordCards = DictionaryFileManipulator.loadDictionaryByLines(getContentResolver().openInputStream(uri));
+			List<WordCard> allWordCards = DictionaryFileManipulator.loadDictionaryByLines(getContentResolver().openInputStream(uri));
 			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
 			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
@@ -215,9 +201,21 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 			lastOpened();
 			return true;
 		case R.id.menu_next_step:
-			getLearningManager().startNextStage();
+			if (getLearningManager().getCurrentStage().isLast()) {
+				ContextHolder.getUiUpdator(getLearningManager().getCurrentStage().getNext()).createNewActivity();
+			}
+			boolean endReached = getLearningManager().startNextStage();
+			if (endReached) {
+				Context context = getApplicationContext();
+				Toast toast = Toast.makeText(context, getResources().getString(R.string.end_of_dict),
+						Toast.LENGTH_SHORT);
+				toast.show();
+			}
 			return true;
 		case R.id.menu_prev_step:
+			if (getLearningManager().getCurrentStage().isLast()) {
+				ContextHolder.getUiUpdator(getLearningManager().getCurrentStage().getPrevious()).createNewActivity();
+			}
 			getLearningManager().startPreviousStage();
 			return true;
 		case R.id.menu_open:
@@ -287,7 +285,7 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 
 	private String getDictViewContent() {
 		StringBuilder sb = new StringBuilder("<ol>");
-		allWordCards.forEach(card -> {
+		ContextHolder.getAllWordCards().forEach(card -> {
 			sb.append("<li>" + card.toString() + "</li>");
 		});
 		sb.append("</ol>");
@@ -435,8 +433,8 @@ public class MainFormActivity extends GeneralMainActivity implements UiUpdator {
 		int startFromNumber = getStartFromNumber();
 		Context context = getApplicationContext();
 		Toast toast = Toast.makeText(context,
-				getResources().getString(R.string.words) + allWordCards.get(startFromNumber).getWord() + "-"
-						+ allWordCards.get(startFromNumber + 9).getWord() + " (" + (startFromNumber + 1) + "-"
+				getResources().getString(R.string.words) + ContextHolder.getAllWordCards().get(startFromNumber).getWord() + "-"
+						+ ContextHolder.getAllWordCards().get(startFromNumber + 9).getWord() + " (" + (startFromNumber + 1) + "-"
 						+ (startFromNumber + 10) + ")",
 				Toast.LENGTH_SHORT);
 		toast.show();
