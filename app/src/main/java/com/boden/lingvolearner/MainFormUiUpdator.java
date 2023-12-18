@@ -44,6 +44,7 @@ public class MainFormUiUpdator implements UiUpdator {
 	private TextView Vword;
 	private ListView listView;
 	private GeneralMainActivity mainActivity;
+	private ArrayAdapter<String> adapt;
 
 	public MainFormUiUpdator(GeneralMainActivity mainActivity) {
 		this.mainActivity = mainActivity;
@@ -59,7 +60,7 @@ public class MainFormUiUpdator implements UiUpdator {
 	}
 
 	public void listSetAdapter() {
-		ArrayAdapter<String> adapt = new ArrayAdapter<String>(mainActivity, R.layout.list_item,
+		adapt = new ArrayAdapter<String>(mainActivity, R.layout.list_item,
 				getLearningManager().getWordChoices()) {
 
 			@Override
@@ -89,6 +90,10 @@ public class MainFormUiUpdator implements UiUpdator {
 			}
 		};
 		listView.setAdapter(adapt);
+	}
+
+	public void updateList() {
+		adapt.notifyDataSetChanged();
 	}
 
 	@Override

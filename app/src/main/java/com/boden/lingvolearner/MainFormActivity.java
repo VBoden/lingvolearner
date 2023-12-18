@@ -256,7 +256,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				ContextHolder.getSettingsHolder().decreaseTextSize();
-				mainFormUiUpdator.listSetAdapter();
+				mainFormUiUpdator.updateList();
 				return true;
 			}
 		});
@@ -264,7 +264,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				ContextHolder.getSettingsHolder().increaseTextSize();
-				mainFormUiUpdator.listSetAdapter();
+				mainFormUiUpdator.updateList();
 				return true;
 			}
 		});
@@ -272,7 +272,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				ContextHolder.getSettingsHolder().decreaseTextPadding();
-				mainFormUiUpdator.listSetAdapter();
+				mainFormUiUpdator.updateList();
 				return true;
 			}
 		});
@@ -280,7 +280,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
 				ContextHolder.getSettingsHolder().increaseTextPadding();
-				mainFormUiUpdator.listSetAdapter();
+				mainFormUiUpdator.updateList();
 				return true;
 			}
 		});
