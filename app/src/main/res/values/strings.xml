@@ -42,6 +42,7 @@
     <string name="select">"Вибрати"</string>
     
     
+    <string name="open_db">Вибрати набір слів</string>
     <string name="open">Вибрати словник</string>
     <string name="option_kilk">Повторювати слова (кількість раз):</string>
     <string name="option_use_TTS">Промовляти слова, використовуючи TTS</string>
@@ -58,7 +59,12 @@
     <string name="title_activity_last_opend">Недавно відкриті словники</string>
     <string name="title_activity_select_dir">Тека із звуковими файлами</string>
     <string name="title_activity_select_new_path">Нове розміщення словника</string>
+    <string name="title_activity_load_from_db">Завантажити з бази</string>
      <string name="coud_not_open_help">"Не вдалось відкрити довідку"</string>
-    
+
+    <string name="category">Категорія</string>
+    <string name="dictionary">Словник</string>
+    <string name="randomize">Перемішати слова</string>
+    <string name="noWordsFound">Не знайдено слів! Зробіть інший вибір.</string>
 
 </resources>

@@ -36,6 +36,10 @@
             android:exported="true"
             android:label="@string/app_name"></activity>
         <activity
+            android:name="com.boden.lingvolearner.SelectDbDictionaryActivity"
+            android:exported="true"
+            android:label="@string/title_activity_load_from_db"></activity>
+        <activity
             android:name="com.boden.lingvolearner.LastOpendActivity"
             android:exported="true"
             android:label="@string/title_activity_last_opend"></activity>

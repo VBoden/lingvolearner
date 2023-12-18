@@ -18,10 +18,15 @@
         android:showAsAction="never"
         android:title="@string/dict_preview"/>
     <item
-        android:id="@+id/menu_open"
+        android:id="@+id/menu_open_db"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/open"/>
+        android:title="@string/open_db"/>
+   <item
+       android:id="@+id/menu_open"
+       android:orderInCategory="100"
+       android:showAsAction="never"
+       android:title="@string/open"/>
     <item
         android:id="@+id/menu_last_opend"
         android:orderInCategory="100"

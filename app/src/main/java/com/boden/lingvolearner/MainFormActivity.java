@@ -13,6 +13,7 @@ import com.boden.lingvolearner.services.DictionaryFileManipulator;
 import com.boden.lingvolearner.services.Stage;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -37,6 +38,7 @@ public class MainFormActivity extends GeneralMainActivity {
 
 	private static final int REQUEST_CODE_OPTION_ACTIVITY = 2;
 	private static final int REQUEST_CODE_SELECTDICT = 3;
+	private static final int REQUEST_CODE_SELECT_DB = 4;
 	private static final int REQUEST_CODE_LAST_OPEND_ACTIVITY = 3;
 	private static final int IDD_SET_START_NUMBER = 1;
 
@@ -58,7 +60,8 @@ public class MainFormActivity extends GeneralMainActivity {
 		ContextHolder.setWordPlayer(player);
 		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
-		startDictFileSelection();
+//		startDictFileSelection();
+		selectDictionaryFromDB();
 	}
 
 	public Menu getMenu() {
@@ -108,7 +111,11 @@ public class MainFormActivity extends GeneralMainActivity {
 				loadDictionary(data.getData());
 			}
 			break;
-
+		case REQUEST_CODE_SELECT_DB:
+			if(resultCode == Activity.RESULT_OK){
+				getLearningManager().startLearning();
+			}
+			break;
 		}
 	}
 
@@ -168,6 +175,9 @@ public class MainFormActivity extends GeneralMainActivity {
 				ContextHolder.getUiUpdator(getLearningManager().getCurrentStage().getPrevious()).createNewActivity();
 			}
 			getLearningManager().startPreviousStage();
+			return true;
+		case R.id.menu_open_db:
+			selectDictionaryFromDB();
 			return true;
 		case R.id.menu_open:
 			startDictFileSelection();
@@ -232,6 +242,14 @@ public class MainFormActivity extends GeneralMainActivity {
 		intent.setClass(MainFormActivity.this, HelpActivity.class);
 		intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
 		startActivity(intent);
+	}
+
+	private void selectDictionaryFromDB() {
+		Intent intent = new Intent();
+		intent.setClass(MainFormActivity.this, SelectDbDictionaryActivity.class);
+//		intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
+//		startActivity(intent);
+		startActivityForResult(intent, REQUEST_CODE_SELECT_DB);
 	}
 
 	private String getDictViewContent() {
