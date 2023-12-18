@@ -29,6 +29,7 @@ import java.util.List;
 import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 
 public class SelectDbDictionaryActivity extends Activity {
+	private static final String ID_SEP = "=id=";
 	protected static final String CONTENT = "content";
 	private ListView listView;
 	private ToggleButton categoryOrDictionary;
@@ -93,7 +94,7 @@ public class SelectDbDictionaryActivity extends Activity {
 						cursor = dbManager.fetchEntitiesWithoutCategory();
 					} else {
 						String selected = ContextHolder.getInstance().getCategories()[position];
-						String selectionId = selected.split("=id=")[1];
+						String selectionId = selected.split(ID_SEP)[1];
 						cursor = dbManager.fetchEntitiesByCategory(selectionId);
 					}
 				} else {
@@ -101,7 +102,7 @@ public class SelectDbDictionaryActivity extends Activity {
 						cursor = dbManager.fetchEntitiesWithoutDictionary();
 					} else {
 						String selected = ContextHolder.getInstance().getDictionaries()[position];
-						String selectionId = selected.split("=id=")[1];
+						String selectionId = selected.split(ID_SEP)[1];
 						cursor = dbManager.fetchEntitiesByDictionary(selectionId);
 					}
 				}
@@ -123,12 +124,21 @@ public class SelectDbDictionaryActivity extends Activity {
 	}
 	private void updateListAdaptor(boolean isChecked) {
 		if (isChecked) {
+			String[] categories = removeIds(ContextHolder.getInstance().getCategories());
 			listView.setAdapter(new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item,
-					ContextHolder.getInstance().getCategories()));					
+					categories));					
 		} else {
+			String[] dictionaries = removeIds(ContextHolder.getInstance().getDictionaries());
 			listView.setAdapter(new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item,
-					ContextHolder.getInstance().getDictionaries()));
+					dictionaries));
 		}
+	}
+	private String[] removeIds(String[] items) {
+		String[] cleared = new String[items.length];
+		for(int i=0;i<items.length;i++){
+			cleared[i]=items[i].split(ID_SEP)[0];
+		}
+		return cleared;
 	}
 	private boolean loadWordsTranslation(Cursor cursor, boolean shuffleSelected) {
 		List<WordCard> allWordCards = new ArrayList<>();
@@ -160,7 +170,7 @@ public class SelectDbDictionaryActivity extends Activity {
 			List<String> itemsList = new ArrayList<>();
 
 			while (cursor.moveToNext()) {
-				itemsList.add(cursor.getString(1) + "=id=" + cursor.getInt(0));
+				itemsList.add(cursor.getString(1) + ID_SEP + cursor.getInt(0));
 				// id[i] = cursor.getInt(0);
 				// fname[i] = cursor.getString(1);
 				// lname[i] = cursor.getString(2);
