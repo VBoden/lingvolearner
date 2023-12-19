@@ -39,6 +39,27 @@ public class OptionActivity extends GeneralMainActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.options);
 
+		setUpPathToSoundFiles();
+		setUpRepeatCountField();
+		setUpTTSSelection();
+		setUpPlayLanguage();
+		setUpCheckBoxUseTts();
+		setUpCheckBoxUseFiles();
+
+		button = (Button) findViewById(R.id.but);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent();
+				intent.setClass(OptionActivity.this, SelectDirActivity.class);
+				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR, pathToSoundFiles);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_DIR);
+
+			}
+		});
+	}
+
+	private void setUpPathToSoundFiles() {
 		pathToSoundFilesField = (EditText) findViewById(R.id.edit1);
 		pathToSoundFilesField.setText(getSettingsHolder().getPathToSoundFiles());
 		pathToSoundFilesField.addTextChangedListener(new TextWatcher() {
@@ -55,7 +76,9 @@ public class OptionActivity extends GeneralMainActivity {
 				getSettingsHolder().setPathToSoundFiles(pathToSoundFilesField.getText().toString());
 			}
 		});
+	}
 
+	private void setUpRepeatCountField() {
 		edit2 = (EditText) findViewById(R.id.edit2);
 		edit2.setText("" + getSettingsHolder().getRepeatCount());
 		edit2.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -77,7 +100,9 @@ public class OptionActivity extends GeneralMainActivity {
 				}
 			}
 		});
+	}
 
+	private void setUpTTSSelection() {
 		OnClickListener radioButtonOnClick = new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -105,19 +130,9 @@ public class OptionActivity extends GeneralMainActivity {
 		}
 		radioButton1.setOnClickListener(radioButtonOnClick);
 		radioButton2.setOnClickListener(radioButtonOnClick);
+	}
 
-		button = (Button) findViewById(R.id.but);
-		button.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setClass(OptionActivity.this, SelectDirActivity.class);
-				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR, pathToSoundFiles);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_DIR);
-
-			}
-		});
-
+	private void setUpPlayLanguage() {
 		Spinner dropdown = findViewById(R.id.languageSelector);
 		String[] items = new String[] { "English (UK)", "English (US)", "Espanol", "French (France)", "German",
 				"Polish", "Українська" };
@@ -148,7 +163,9 @@ public class OptionActivity extends GeneralMainActivity {
 
 			}
 		});
+	}
 
+	private void setUpCheckBoxUseTts() {
 		final CheckBox checkBoxUseTts = (CheckBox) findViewById(R.id.checkBox1);
 		checkBoxUseTts.setChecked(getSettingsHolder().isUseTtsToSay());
 		setRadioButtonsEnabled(getSettingsHolder().isUseTtsToSay());
@@ -159,7 +176,9 @@ public class OptionActivity extends GeneralMainActivity {
 				setRadioButtonsEnabled(checkBoxUseTts.isChecked());
 			}
 		});
+	}
 
+	private void setUpCheckBoxUseFiles() {
 		final CheckBox checkBoxUseFiles = (CheckBox) findViewById(R.id.checkBox2);
 		checkBoxUseFiles.setChecked(getSettingsHolder().isUseFilesToSay());
 		setForChB2Enabled(getSettingsHolder().isUseFilesToSay());
@@ -170,7 +189,6 @@ public class OptionActivity extends GeneralMainActivity {
 				setForChB2Enabled(checkBoxUseFiles.isChecked());
 			}
 		});
-
 	}
 
 	private void setRadioButtonsEnabled(boolean b) {
