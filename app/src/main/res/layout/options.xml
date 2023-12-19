@@ -5,6 +5,28 @@
     android:orientation="vertical" >
 
     <TextView
+        android:id="@+id/languageFromLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/languageFrom" />
+
+    <Spinner
+        android:id="@+id/languageFrom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/languageToLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/languageTo" />
+
+    <Spinner
+        android:id="@+id/languageTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:id="@+id/text2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

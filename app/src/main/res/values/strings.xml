@@ -50,6 +50,8 @@
     <string name="option_use_FliteTTS">Flite TTS</string>
     <string name="option_use_sound_files">Використовувати звукові файли при наявності</string>
     <string name="option_language_label">Будь ласка, виберіть мову промовляння</string>
+    <string name="languageFrom">Мова слова:</string>
+    <string name="languageTo">Мова перекладу:</string>
     <string name="option_sound_files_path">Шлях до папки звукових файлів:</string>
     <string name="title_activity_select_dict">Вибрати словник</string>
     <string name="menu_settings">Налаштування</string>

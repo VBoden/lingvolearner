@@ -14,7 +14,9 @@ public class DBManager {
 	private static final String TABLE_CATEGORIES = "words_category";
 
 	private static final String TABLE_DICTIONARIES = "words_dictionary";
+	private static final String TABLE_LANGUAGES = "words_language";
 	public static final String ID = "id";
+	public static final String CODE = "code";
 	public static final String NAME = "name";
 	public static final String DESC = "description";
 
@@ -48,18 +50,12 @@ public class DBManager {
 	public Cursor fetchCategories() {
 		String[] columns = new String[] { ID, NAME };
 		Cursor cursor = database.query(TABLE_CATEGORIES, columns, null, null, null, null, null);
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
 		return cursor;
 	}
 
 	public Cursor fetchDictionaries() {
 		String[] columns = new String[] { ID, NAME };
 		Cursor cursor = database.query(TABLE_DICTIONARIES, columns, null, null, null, null, null);
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
 		return cursor;
 	}
 
@@ -93,9 +89,9 @@ public class DBManager {
 		// d2_0 on d1_0.id=d2_0.dictionaryentry_id where d2_0.dictionary_id in
 		// (?)
 
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
+//		if (cursor != null) {
+//			cursor.moveToFirst();
+//		}
 		return cursor;
 	}
 
@@ -104,9 +100,6 @@ public class DBManager {
 		String query = "SELECT w.word,e.transcription,t.word FROM words_dictionaryentry as e join words_word as w on w.id=e.word_id join words_word as t on t.id=e.translation_id "
 				+ "left join words_word_category as wc on w.id=wc.word_id " + "where wc.category_id is null;";
 		Cursor cursor = database.rawQuery(query, null);
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
 		return cursor;
 	}
 
@@ -116,9 +109,6 @@ public class DBManager {
 				+ "left join words_dictionaryentry_dictionary ed on e.id=ed.dictionaryentry_id "
 				+ "where ed.dictionary_id=?;";
 		Cursor cursor = database.rawQuery(query, new String[] { dictionaryId });
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
 		return cursor;
 	}
 
@@ -128,9 +118,12 @@ public class DBManager {
 				+ "left join words_dictionaryentry_dictionary as ed on e.id=ed.dictionaryentry_id "
 				+ "where ed.dictionary_id is null;";
 		Cursor cursor = database.rawQuery(query, null);
-		if (cursor != null) {
-			cursor.moveToFirst();
-		}
+		return cursor;
+	}
+
+	public Cursor fetchLanguages() {
+		String[] columns = new String[] { CODE, NAME };
+		Cursor cursor = database.query(TABLE_LANGUAGES, columns, null, null, null, null, null);
 		return cursor;
 	}
 

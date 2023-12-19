@@ -60,8 +60,11 @@ public class MainFormActivity extends GeneralMainActivity {
 		ContextHolder.setWordPlayer(player);
 		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
-//		startDictFileSelection();
-		selectDictionaryFromDB();
+		try {
+			selectDictionaryFromDB();
+		} catch (Throwable e) {
+			startDictFileSelection();
+		}
 	}
 
 	public Menu getMenu() {

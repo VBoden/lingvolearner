@@ -142,7 +142,7 @@ public class SelectDbDictionaryActivity extends Activity {
 	}
 	private boolean loadWordsTranslation(Cursor cursor, boolean shuffleSelected) {
 		List<WordCard> allWordCards = new ArrayList<>();
-		if (cursor.getCount() > 0) {
+		if (cursor != null && cursor.getCount() > 0) {
 			int i = 0;
 			while (cursor.moveToNext()) {
 				allWordCards.add(new WordCard(cursor.getString(0), cursor.getString(1), cursor.getString(2)));
@@ -162,7 +162,7 @@ public class SelectDbDictionaryActivity extends Activity {
 
 	private String[] fetchList(String firstElement, Cursor cursor) {
 		String[] items = new String[] {};
-		if (cursor.getCount() > 0) {
+		if (cursor != null && cursor.getCount() > 0) {
 			// id = new int[cursor.getCount()];
 			// fname = new String[cursor.getCount()];
 			// lname = new String[cursor.getCount()];

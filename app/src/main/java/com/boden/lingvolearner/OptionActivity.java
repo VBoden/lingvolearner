@@ -2,11 +2,19 @@ package com.boden.lingvolearner;
 
 import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.boden.lingvolearner.services.ContextHolder;
+import com.boden.lingvolearner.services.SettingsHolder;
+import com.boden.lingvolearner.sqlite.DBManager;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -33,18 +41,19 @@ public class OptionActivity extends GeneralMainActivity {
 	private RadioButton radioButton1;
 	private RadioButton radioButton2;
 	private Button button;
+	private List<String> languages = new ArrayList<>();
+	private List<String> languageCodes = new ArrayList<>();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.options);
-
+		setUpLanguagesSelectors();
 		setUpPathToSoundFiles();
 		setUpRepeatCountField();
 		setUpTTSSelection();
 		setUpPlayLanguage();
 		setUpCheckBoxUseTts();
-		setUpCheckBoxUseFiles();
 
 		button = (Button) findViewById(R.id.but);
 		button.setOnClickListener(new OnClickListener() {
@@ -52,8 +61,93 @@ public class OptionActivity extends GeneralMainActivity {
 			public void onClick(View v) {
 				Intent intent = new Intent();
 				intent.setClass(OptionActivity.this, SelectDirActivity.class);
-				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR, pathToSoundFiles);
+				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR,
+				// pathToSoundFiles);
 				startActivityForResult(intent, REQUEST_CODE_SELECT_DIR);
+
+			}
+		});
+		setUpCheckBoxUseFiles();
+	}
+
+	private void setUpLanguagesSelectors() {
+		DBManager dbManager = new DBManager(this);
+		dbManager.open();
+		Cursor cursor = dbManager.fetchLanguages();
+		fetchLanguages(cursor);
+		dbManager.close();
+		setUpLanguageSelector(R.id.languageFrom, getSettingsHolder()::setLanguageFrom,
+				getSettingsHolder()::getLanguageFrom);
+		setUpLanguageSelector(R.id.languageTo, getSettingsHolder()::setLanguageTo,
+				getSettingsHolder()::getLanguageTo);
+	}
+
+	private void setUpLanguageSelector(int id, Consumer<String> languageSetter, Supplier<String> languageGetter) {
+		Spinner dropdown = (Spinner) findViewById(id);
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
+				languages.toArray(new String[]{}));
+		dropdown.setAdapter(adapter);
+		String language = languageGetter.get();
+		int pos = 0;
+		for (String lang : languageCodes) {
+			if (lang.equalsIgnoreCase(language)) {
+				break;
+			}
+			pos++;
+		}
+		if (pos < languageCodes.size()) {
+			dropdown.setSelection(pos);
+		}
+		dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+				languageSetter.accept(languageCodes.get(position));
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {
+
+			}
+		});
+	}
+
+	private void fetchLanguages(Cursor cursor) {
+		if (cursor != null && cursor.getCount() > 0) {
+			while (cursor.moveToNext()) {
+				languageCodes.add(cursor.getString(0));
+				languages.add(cursor.getString(1));
+			}
+		}
+	}
+
+	private void setUpPlayLanguage() {
+		Spinner dropdown = findViewById(R.id.languageSelector);
+		String[] items = new String[] { "English (UK)", "English (US)", "Espanol", "French (France)", "German",
+				"Polish", "Українська" };
+		final Locale[] languageCodes = new Locale[] { Locale.UK, Locale.US, new Locale("es", "ES"), Locale.FRANCE,
+				Locale.GERMAN, new Locale("pl", "PL"), new Locale("uk", "UA") };
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+		dropdown.setAdapter(adapter);
+		String language = getSettingsHolder().getLanguage();
+		int pos = 0;
+		for (Locale lang : languageCodes) {
+			if (lang.toLanguageTag().equalsIgnoreCase(language)) {
+				break;
+			}
+			pos++;
+		}
+		if (pos < languageCodes.length) {
+			dropdown.setSelection(pos);
+		}
+		dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+				getSettingsHolder().setLanguage(languageCodes[position].toLanguageTag());
+				ContextHolder.getWordSpeaker().updateLanguageSelection(languageCodes[position].toLanguageTag());
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {
 
 			}
 		});
@@ -130,39 +224,6 @@ public class OptionActivity extends GeneralMainActivity {
 		}
 		radioButton1.setOnClickListener(radioButtonOnClick);
 		radioButton2.setOnClickListener(radioButtonOnClick);
-	}
-
-	private void setUpPlayLanguage() {
-		Spinner dropdown = findViewById(R.id.languageSelector);
-		String[] items = new String[] { "English (UK)", "English (US)", "Espanol", "French (France)", "German",
-				"Polish", "Українська" };
-		final Locale[] languageCodes = new Locale[] { Locale.UK, Locale.US, new Locale("es", "ES"), Locale.FRANCE,
-				Locale.GERMAN, new Locale("pl", "PL"), new Locale("uk", "UA") };
-		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
-		dropdown.setAdapter(adapter);
-		String language = getSettingsHolder().getLanguage();
-		int pos = 0;
-		for (Locale lang : languageCodes) {
-			if (lang.toLanguageTag().equalsIgnoreCase(language)) {
-				break;
-			}
-			pos++;
-		}
-		if (pos < languageCodes.length) {
-			dropdown.setSelection(pos);
-		}
-		dropdown.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-				getSettingsHolder().setLanguage(languageCodes[position].toLanguageTag());
-				ContextHolder.getWordSpeaker().updateLanguageSelection(languageCodes[position].toLanguageTag());
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> adapterView) {
-
-			}
-		});
 	}
 
 	private void setUpCheckBoxUseTts() {

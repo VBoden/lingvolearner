@@ -17,6 +17,8 @@ public class SettingsHolder {
 	public static final String SHUFFLE_WORDS = "shuffleWords";
 	public static final String PATH_TO_SOUND_FILES = "pathToSoundFiles";
 	public static final String LANGUAGE = "ttsLanguage";
+	public static final String LANGUAGE_FROM = "languageFrom";
+	public static final String LANGUAGE_TO = "languageTo";
 
 	private UserPreferences userPrefs;
 	private int textPadding;
@@ -31,6 +33,8 @@ public class SettingsHolder {
 	private boolean shuffleWords;
 
 	private String language;
+	private String languageFrom;
+	private String languageTo;
 	private Dict dict;
 	private ArrayList<Dict> listOfDicts = new ArrayList<>();
 
@@ -44,6 +48,8 @@ public class SettingsHolder {
 		textPadding = userPrefs.getInt(TEXT_PADDING, 10);
 		repeatCount = userPrefs.getInt(REPEAT_COUNT, 5);
 		language = userPrefs.getString(LANGUAGE, Locale.US.getLanguage());
+		languageFrom = userPrefs.getString(LANGUAGE_FROM, Locale.US.getLanguage());
+		languageTo = userPrefs.getString(LANGUAGE_TO, "uk");
 		useTtsToSay = userPrefs.getBoolean(USE_TTS_TO_SAY, true);
 		usedTts = userPrefs.getInt(USED_TTS, 1);
 		useFilesToSay = userPrefs.getBoolean(USE_FILES_TO_SAY, true);
@@ -229,6 +235,24 @@ public class SettingsHolder {
 	public void setLanguage(String languageTag) {
 		language = languageTag;
 		userPrefs.saveString(LANGUAGE, languageTag);
+	}
+
+	public String getLanguageFrom() {
+		return languageFrom;
+	}
+
+	public void setLanguageFrom(String languageFrom) {
+		this.languageFrom = languageFrom;
+		userPrefs.saveString(LANGUAGE_FROM, languageFrom);
+	}
+
+	public String getLanguageTo() {
+		return languageTo;
+	}
+
+	public void setLanguageTo(String languageTo) {
+		this.languageTo = languageTo;
+		userPrefs.saveString(LANGUAGE_TO, languageTo);
 	}
 
 	public int getUsedTts() {
