@@ -42,7 +42,6 @@ public class MainFormActivity extends GeneralMainActivity {
 	private static final int REQUEST_CODE_LAST_OPEND_ACTIVITY = 3;
 	private static final int IDD_SET_START_NUMBER = 1;
 
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -60,11 +59,8 @@ public class MainFormActivity extends GeneralMainActivity {
 		ContextHolder.setWordPlayer(player);
 		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
-		try {
-			selectDictionaryFromDB();
-		} catch (Throwable e) {
-			startDictFileSelection();
-		}
+		selectDictionaryFromDB();
+		// startDictFileSelection();
 	}
 
 	public Menu getMenu() {
@@ -115,8 +111,10 @@ public class MainFormActivity extends GeneralMainActivity {
 			}
 			break;
 		case REQUEST_CODE_SELECT_DB:
-			if(resultCode == Activity.RESULT_OK){
+			if (resultCode == Activity.RESULT_OK) {
 				getLearningManager().startLearning();
+			} else if (resultCode == 2) {
+				startDictFileSelection();
 			}
 			break;
 		}
@@ -125,8 +123,9 @@ public class MainFormActivity extends GeneralMainActivity {
 	private boolean loadDictionary(Uri uri) {
 		System.out.println("uri=" + uri);
 		try {
-//			getContentResolver().takePersistableUriPermission(uri, 0);
-			List<WordCard> allWordCards = DictionaryFileManipulator.loadDictionaryByLines(getContentResolver().openInputStream(uri));
+			// getContentResolver().takePersistableUriPermission(uri, 0);
+			List<WordCard> allWordCards = DictionaryFileManipulator
+					.loadDictionaryByLines(getContentResolver().openInputStream(uri));
 			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
 			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
@@ -250,8 +249,8 @@ public class MainFormActivity extends GeneralMainActivity {
 	private void selectDictionaryFromDB() {
 		Intent intent = new Intent();
 		intent.setClass(MainFormActivity.this, SelectDbDictionaryActivity.class);
-//		intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
-//		startActivity(intent);
+		// intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
+		// startActivity(intent);
 		startActivityForResult(intent, REQUEST_CODE_SELECT_DB);
 	}
 
@@ -339,7 +338,8 @@ public class MainFormActivity extends GeneralMainActivity {
 							if (startFromNumber < 0) {
 								throw new Exception();
 							}
-							// Log.i("DEBUG_lAST", "startFromNumber=" + startFromNumber);
+							// Log.i("DEBUG_lAST", "startFromNumber=" +
+							// startFromNumber);
 
 							ContextHolder.getSettingsHolder().updateStartNumber(startFromNumber);
 							getLearningManager().startLearning();

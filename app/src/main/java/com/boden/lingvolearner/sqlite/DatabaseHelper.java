@@ -12,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public static final String SUBJECT = "subject";
 	public static final String DESC = "description";
 
-	static final String DB_NAME = "prod-db.sqlite3";
+	public static final String DB_NAME = "prod-db.sqlite3";
 
 	static final int DB_VERSION = 1;
 
@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL(CREATE_TABLE);
+//		db.execSQL(CREATE_TABLE);
 	}
 
 	@Override

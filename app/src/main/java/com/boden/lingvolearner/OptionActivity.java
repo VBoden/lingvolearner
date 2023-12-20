@@ -1,7 +1,10 @@
 package com.boden.lingvolearner;
 
+import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 import static com.boden.lingvolearner.services.ContextHolder.getSettingsHolder;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,12 +12,15 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.boden.lingvolearner.pojo.WordCard;
 import com.boden.lingvolearner.services.ContextHolder;
+import com.boden.lingvolearner.services.DictionaryFileManipulator;
 import com.boden.lingvolearner.services.SettingsHolder;
 import com.boden.lingvolearner.sqlite.DBManager;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -34,6 +40,7 @@ import android.widget.Toast;
 public class OptionActivity extends GeneralMainActivity {
 	public static final String EXT_NAME_DIR = "dirName";
 	private static final int REQUEST_CODE_SELECT_DIR = 0;
+	private static final int REQUEST_CODE_SELECT_DB = 1;
 	private static final int USE_GOOGLE_TTS = 1;
 	private static final int USE_FLITE_TTS = 2;
 
@@ -67,25 +74,49 @@ public class OptionActivity extends GeneralMainActivity {
 
 			}
 		});
+		setUpUpdateDB();
 		setUpCheckBoxUseFiles();
+	}
+
+	private void setUpUpdateDB() {
+		Button updateDB = findViewById(R.id.updateDB);
+		updateDB.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+				intent.addCategory(Intent.CATEGORY_OPENABLE);
+				intent.setType("*/*");
+				try {
+					startActivityForResult(intent, REQUEST_CODE_SELECT_DB);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
 	}
 
 	private void setUpLanguagesSelectors() {
 		DBManager dbManager = new DBManager(this);
-		dbManager.open();
-		Cursor cursor = dbManager.fetchLanguages();
-		fetchLanguages(cursor);
-		dbManager.close();
-		setUpLanguageSelector(R.id.languageFrom, getSettingsHolder()::setLanguageFrom,
-				getSettingsHolder()::getLanguageFrom);
-		setUpLanguageSelector(R.id.languageTo, getSettingsHolder()::setLanguageTo,
-				getSettingsHolder()::getLanguageTo);
+		try {
+			dbManager.open();
+			Cursor cursor = dbManager.fetchLanguages();
+			fetchLanguages(cursor);
+			setUpLanguageSelector(R.id.languageFrom, getSettingsHolder()::setLanguageFrom,
+					getSettingsHolder()::getLanguageFrom);
+			setUpLanguageSelector(R.id.languageTo, getSettingsHolder()::setLanguageTo,
+					getSettingsHolder()::getLanguageTo);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally{
+			dbManager.close();
+		}
 	}
 
 	private void setUpLanguageSelector(int id, Consumer<String> languageSetter, Supplier<String> languageGetter) {
 		Spinner dropdown = (Spinner) findViewById(id);
 		ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
-				languages.toArray(new String[]{}));
+				languages.toArray(new String[] {}));
 		dropdown.setAdapter(adapter);
 		String language = languageGetter.get();
 		int pos = 0;
@@ -272,6 +303,29 @@ public class OptionActivity extends GeneralMainActivity {
 				if (result != null) {
 					pathToSoundFilesField.setText(result);
 					getSettingsHolder().setPathToSoundFiles(result);
+				}
+			}
+			break;
+		case REQUEST_CODE_SELECT_DB:
+			if (resultCode == RESULT_OK) {
+				Uri uri = data.getData();
+				DBManager dbManager = new DBManager(this);
+				try {
+					dbManager.copyDBfile(uri, getContentResolver().openInputStream(uri));
+					Toast toast = Toast.makeText(getApplicationContext(), "Базу успішно оновлено.", Toast.LENGTH_SHORT);
+					toast.show();
+				} catch (IOException e) {
+					e.printStackTrace();
+					Toast toast = Toast.makeText(getApplicationContext(), "Проблеми із читанням/записом файлу!",
+							Toast.LENGTH_SHORT);
+					toast.show();
+				} catch (Exception e) {
+					e.printStackTrace();
+					Toast toast = Toast.makeText(getApplicationContext(), "Не вдалось оновити базу!",
+							Toast.LENGTH_SHORT);
+					toast.show();
+				} finally {
+					dbManager.close();
 				}
 			}
 			break;

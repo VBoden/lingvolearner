@@ -3,6 +3,7 @@ package com.boden.lingvolearner;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -52,75 +53,82 @@ public class SelectDbDictionaryActivity extends Activity {
 		shuffleCheckBox = findViewById(R.id.randomizeCheckBox);
 		shuffleCheckBox.setChecked(ContextHolder.getSettingsHolder().isShuffleWords());
 
-		dbManager = new DBManager(this);
-		dbManager.open();
-		Cursor cursor= dbManager.fetchCategories();
-		String defaultTitle= "Без категорії";
-		ContextHolder.getInstance().setCategories(fetchList(defaultTitle, cursor));
-		cursor = dbManager.fetchDictionaries();
-		defaultTitle = "Без словника";
-		ContextHolder.getInstance().setDictionaries(fetchList(defaultTitle, cursor));
+		try {
+			dbManager = new DBManager(this);
+			dbManager.open();
+			Cursor cursor = dbManager.fetchCategories();
+			String defaultTitle = "Без категорії";
+			ContextHolder.getInstance().setCategories(fetchList(defaultTitle, cursor));
+			cursor = dbManager.fetchDictionaries();
+			defaultTitle = "Без словника";
+			ContextHolder.getInstance().setDictionaries(fetchList(defaultTitle, cursor));
 
-		categoryOrDictionary = findViewById(R.id.categoryOrDictionary);
-		categoryOrDictionary.setTextOff(categoryOrDictionary.getContext().getResources().getText(R.string.dictionary));
-		categoryOrDictionary.setTextOn(categoryOrDictionary.getContext().getResources().getText(R.string.category));
-		categoryOrDictionary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				ContextHolder.getSettingsHolder().setCategoriesDisplaySelected(isChecked);
-				updateListAdaptor(isChecked);
-			}
+			categoryOrDictionary = findViewById(R.id.categoryOrDictionary);
+			categoryOrDictionary.setTextOff(categoryOrDictionary.getContext().getResources().getText(R.string.dictionary));
+			categoryOrDictionary.setTextOn(categoryOrDictionary.getContext().getResources().getText(R.string.category));
+			categoryOrDictionary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					ContextHolder.getSettingsHolder().setCategoriesDisplaySelected(isChecked);
+					updateListAdaptor(isChecked);
+				}
 
-			
-		});
-		categoryOrDictionary.setChecked(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
-		updateListAdaptor(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
+
+			});
+			categoryOrDictionary.setChecked(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
+			updateListAdaptor(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
 
 //		String[] items = fetchList("Без категорії", dbManager.fetchCategories());
 //		listView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, items));
 
-		// SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-		// R.layout.list_item, cursor, from, to, 0);
-		// adapter.notifyDataSetChanged();
+			// SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
+			// R.layout.list_item, cursor, from, to, 0);
+			// adapter.notifyDataSetChanged();
 
-		// listView.setAdapter(adapter);
+			// listView.setAdapter(adapter);
 
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
-				Cursor cursor;
-				if (categoryOrDictionary.isChecked()) {
-					if (position == 0) {
-						cursor = dbManager.fetchEntitiesWithoutCategory();
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
+					Cursor cursor;
+					if (categoryOrDictionary.isChecked()) {
+						if (position == 0) {
+							cursor = dbManager.fetchEntitiesWithoutCategory();
+						} else {
+							String selected = ContextHolder.getInstance().getCategories()[position];
+							String selectionId = selected.split(ID_SEP)[1];
+							cursor = dbManager.fetchEntitiesByCategory(selectionId);
+						}
 					} else {
-						String selected = ContextHolder.getInstance().getCategories()[position];
-						String selectionId = selected.split(ID_SEP)[1];
-						cursor = dbManager.fetchEntitiesByCategory(selectionId);
+						if (position == 0) {
+							cursor = dbManager.fetchEntitiesWithoutDictionary();
+						} else {
+							String selected = ContextHolder.getInstance().getDictionaries()[position];
+							String selectionId = selected.split(ID_SEP)[1];
+							cursor = dbManager.fetchEntitiesByDictionary(selectionId);
+						}
 					}
-				} else {
-					if (position == 0) {
-						cursor = dbManager.fetchEntitiesWithoutDictionary();
+					boolean shuffleSelected = shuffleCheckBox.isChecked();
+					ContextHolder.getSettingsHolder().setShuffleWords(shuffleSelected);
+					boolean isLoaded = loadWordsTranslation(cursor, shuffleSelected);
+					if (!isLoaded) {
+						Toast toast = Toast.makeText(getApplicationContext(),
+								getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
+						toast.show();
 					} else {
-						String selected = ContextHolder.getInstance().getDictionaries()[position];
-						String selectionId = selected.split(ID_SEP)[1];
-						cursor = dbManager.fetchEntitiesByDictionary(selectionId);
+
+						Intent returnIntent = new Intent();
+						setResult(Activity.RESULT_OK, returnIntent);
+						finish();
 					}
 				}
-				boolean shuffleSelected = shuffleCheckBox.isChecked();
-				ContextHolder.getSettingsHolder().setShuffleWords(shuffleSelected);
-				boolean isLoaded = loadWordsTranslation(cursor, shuffleSelected);
-				if (!isLoaded) {
-					Toast toast = Toast.makeText(getApplicationContext(),
-							getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
-					toast.show();
-				} else {
-
-					Intent returnIntent = new Intent();
-					setResult(Activity.RESULT_OK, returnIntent);
-					finish();
-				}
-			}
-		});
+			});
+		} catch (SQLiteException e){
+			e.printStackTrace();
+			Intent returnIntent = new Intent();
+			setResult(2, returnIntent);
+			finish();
+		}
 	}
 	private void updateListAdaptor(boolean isChecked) {
 		if (isChecked) {
