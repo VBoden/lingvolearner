@@ -55,6 +55,7 @@
     <string name="loadOrUpdateDBfromFile">Оновити базу слів із файлу</string>
     <string name="option_sound_files_path">Шлях до папки звукових файлів:</string>
     <string name="title_activity_select_dict">Вибрати словник</string>
+    <string name="openPlayer">Відкрити програвач</string>
     <string name="menu_settings">Налаштування</string>
     <string name="settings_shortcut">s</string>
     <string name="menu_dicstmanager">Управління словниками</string>
@@ -63,6 +64,7 @@
     <string name="title_activity_select_dir">Тека із звуковими файлами</string>
     <string name="title_activity_select_new_path">Нове розміщення словника</string>
     <string name="title_activity_load_from_db">Завантажити з бази</string>
+    <string name="title_activity_player">Програвач</string>
      <string name="coud_not_open_help">"Не вдалось відкрити довідку"</string>
 
     <string name="category">Категорія</string>

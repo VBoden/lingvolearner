@@ -39,6 +39,7 @@ public class MainFormActivity extends GeneralMainActivity {
 	private static final int REQUEST_CODE_OPTION_ACTIVITY = 2;
 	private static final int REQUEST_CODE_SELECTDICT = 3;
 	private static final int REQUEST_CODE_SELECT_DB = 4;
+	private static final int REQUEST_CODE_PLAYER_ACTIVITY = 5;
 	private static final int REQUEST_CODE_LAST_OPEND_ACTIVITY = 3;
 	private static final int IDD_SET_START_NUMBER = 1;
 
@@ -186,6 +187,11 @@ public class MainFormActivity extends GeneralMainActivity {
 			return true;
 		case R.id.menu_settings:
 			settings();
+			return true;
+		case R.id.menu_player:
+			Intent intent = new Intent();
+			intent.setClass(MainFormActivity.this, PlayerActivity.class);
+			startActivityForResult(intent, REQUEST_CODE_PLAYER_ACTIVITY);
 			return true;
 
 		default:

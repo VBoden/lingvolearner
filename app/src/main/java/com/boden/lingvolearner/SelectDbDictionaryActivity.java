@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -64,7 +65,8 @@ public class SelectDbDictionaryActivity extends Activity {
 			ContextHolder.getInstance().setDictionaries(fetchList(defaultTitle, cursor));
 
 			categoryOrDictionary = findViewById(R.id.categoryOrDictionary);
-			categoryOrDictionary.setTextOff(categoryOrDictionary.getContext().getResources().getText(R.string.dictionary));
+			categoryOrDictionary
+					.setTextOff(categoryOrDictionary.getContext().getResources().getText(R.string.dictionary));
 			categoryOrDictionary.setTextOn(categoryOrDictionary.getContext().getResources().getText(R.string.category));
 			categoryOrDictionary.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
@@ -73,13 +75,14 @@ public class SelectDbDictionaryActivity extends Activity {
 					updateListAdaptor(isChecked);
 				}
 
-
 			});
 			categoryOrDictionary.setChecked(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
 			updateListAdaptor(ContextHolder.getSettingsHolder().isCategoriesDisplaySelected());
 
-//		String[] items = fetchList("Без категорії", dbManager.fetchCategories());
-//		listView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item, items));
+			// String[] items = fetchList("Без категорії",
+			// dbManager.fetchCategories());
+			// listView.setAdapter(new ArrayAdapter<String>(this,
+			// R.layout.list_item, items));
 
 			// SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
 			// R.layout.list_item, cursor, from, to, 0);
@@ -90,6 +93,7 @@ public class SelectDbDictionaryActivity extends Activity {
 			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
+
 					Cursor cursor;
 					if (categoryOrDictionary.isChecked()) {
 						if (position == 0) {
@@ -110,62 +114,76 @@ public class SelectDbDictionaryActivity extends Activity {
 					}
 					boolean shuffleSelected = shuffleCheckBox.isChecked();
 					ContextHolder.getSettingsHolder().setShuffleWords(shuffleSelected);
-					boolean isLoaded = loadWordsTranslation(cursor, shuffleSelected);
-					if (!isLoaded) {
-						Toast toast = Toast.makeText(getApplicationContext(),
-								getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
-						toast.show();
-					} else {
+					List<WordCard> allWordCards = loadWordsTranslation(cursor, shuffleSelected);
+					if (shuffleSelected) {
+						Collections.shuffle(allWordCards);
+					}
 
+					Bundle extras = getIntent().getExtras();
+					boolean returnName = extras != null ? extras.getBoolean(Constants.NAME_AND_TYPE_ONLY) : false;
+					if (returnName) {
 						Intent returnIntent = new Intent();
+						returnIntent.putExtra("category", categoryOrDictionary.isChecked());
+						String selected = categoryOrDictionary.isChecked()
+								? ContextHolder.getInstance().getCategories()[position]
+								: ContextHolder.getInstance().getDictionaries()[position];
+						String[] selection = selected.split(ID_SEP);
+						returnIntent.putExtra("name", selection[0]);
+						returnIntent.putExtra("id", selection[1]);
 						setResult(Activity.RESULT_OK, returnIntent);
 						finish();
+					} else {
+						boolean isLoaded = allWordCards.size() > 9;
+						if (!isLoaded) {
+							Toast toast = Toast.makeText(getApplicationContext(),
+									getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
+							toast.show();
+						} else {
+							ContextHolder.getInstance().createLearningManager(allWordCards);
+							ContextHolder.getSettingsHolder().setStartFromNumber(0);
+							Intent returnIntent = new Intent();
+							setResult(Activity.RESULT_OK, returnIntent);
+							finish();
+						}
 					}
 				}
 			});
-		} catch (SQLiteException e){
+		} catch (SQLiteException e) {
 			e.printStackTrace();
 			Intent returnIntent = new Intent();
 			setResult(2, returnIntent);
 			finish();
 		}
 	}
+
 	private void updateListAdaptor(boolean isChecked) {
 		if (isChecked) {
 			String[] categories = removeIds(ContextHolder.getInstance().getCategories());
-			listView.setAdapter(new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item,
-					categories));					
+			listView.setAdapter(
+					new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item, categories));
 		} else {
 			String[] dictionaries = removeIds(ContextHolder.getInstance().getDictionaries());
-			listView.setAdapter(new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item,
-					dictionaries));
+			listView.setAdapter(
+					new ArrayAdapter<String>(SelectDbDictionaryActivity.this, R.layout.list_item, dictionaries));
 		}
 	}
+
 	private String[] removeIds(String[] items) {
 		String[] cleared = new String[items.length];
-		for(int i=0;i<items.length;i++){
-			cleared[i]=items[i].split(ID_SEP)[0];
+		for (int i = 0; i < items.length; i++) {
+			cleared[i] = items[i].split(ID_SEP)[0];
 		}
 		return cleared;
 	}
-	private boolean loadWordsTranslation(Cursor cursor, boolean shuffleSelected) {
+
+	private List<WordCard> loadWordsTranslation(Cursor cursor, boolean shuffleSelected) {
 		List<WordCard> allWordCards = new ArrayList<>();
 		if (cursor != null && cursor.getCount() > 0) {
-			int i = 0;
 			while (cursor.moveToNext()) {
 				allWordCards.add(new WordCard(cursor.getString(0), cursor.getString(1), cursor.getString(2)));
-				i++;
-			}
-			if (allWordCards.size()>9) {
-				if (shuffleSelected) {
-					Collections.shuffle(allWordCards);
-				}
-				ContextHolder.getInstance().createLearningManager(allWordCards);
-				ContextHolder.getSettingsHolder().setStartFromNumber(0);
-				return true;
 			}
 		}
-		return false;
+		return allWordCards;
 	}
 
 	private String[] fetchList(String firstElement, Cursor cursor) {

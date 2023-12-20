@@ -40,6 +40,10 @@
             android:exported="true"
             android:label="@string/title_activity_load_from_db"></activity>
         <activity
+            android:name="com.boden.lingvolearner.PlayerActivity"
+            android:exported="true"
+            android:label="@string/title_activity_player"></activity>
+        <activity
             android:name="com.boden.lingvolearner.LastOpendActivity"
             android:exported="true"
             android:label="@string/title_activity_last_opend"></activity>
