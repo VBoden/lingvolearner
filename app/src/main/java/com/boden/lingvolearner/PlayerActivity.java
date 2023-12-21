@@ -40,89 +40,146 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayerActivity extends Activity implements TextToSpeech.OnInitListener {
 
 	private static final int REQUEST_CODE_SELECT_DB = 4;
-	private List<String> names = new ArrayList<>();
-	private TextToSpeech mTts;
-	private boolean finishedSpeak;
-	private boolean paused;
-	private int lastIndex;
-	private int selectedIndex;
+
 	private TextView wordLabel;
 	private TextView translationLabel;
+	private TextView playing;
+	private ImageButton playButton;
+	private Switch reverse;
+	private TextToSpeech mTts;
+	private boolean finishedSpeak;
+	private boolean paused = true;
+	private int lastIndex;
+	private int selectedIndex;
+	private List<String> names = new ArrayList<>();
 	private List<WordCard> wordCards = ContextHolder.getAllWordCards();
+
+	private ListView playList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_player);
+		ContextHolder.getInstance().setLoadedWordCards(new ArrayList<>());
 		wordLabel = findViewById(R.id.word);
 		translationLabel = findViewById(R.id.translation);
+		playing = findViewById(R.id.playing);
+		reverse = findViewById(R.id.reverse);
 
 		mTts = new TextToSpeech(getApplicationContext(), this);
 
-		ImageButton button = (ImageButton) findViewById(R.id.imageButton);
+		setUpPlayButton();
+		setUpAddButton();
+
+		setUpPreviousButton();
+		setUpNextButton();
+
+		playList = (ListView) findViewById(R.id.playlist);
+		registerForContextMenu(playList);
+		playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
+				if (!names.isEmpty()) {
+					selectedIndex = position;
+					playing.setText(names.get(position));
+					wordCards = ContextHolder.getInstance().getLoadedWordCards().get(position);
+					play();
+				}
+			}
+		});
+		String[] items = new String[] { "not selected yet" };
+		playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items));
+	}
+
+	private void setUpAddButton() {
+		ImageButton button = (ImageButton) findViewById(R.id.add);
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				paused = !paused;
-				if (!paused) {
-					// runOnUiThread(new Speaker());
-					new Thread(new Speaker()).start();
-				}
+				Intent intent = new Intent();
+				intent.setClass(PlayerActivity.this, SelectDbDictionaryActivity.class);
+				intent.putExtra(Constants.NAME_AND_TYPE_ONLY, true);
+				startActivityForResult(intent, REQUEST_CODE_SELECT_DB);
 			}
 		});
+	}
 
-		ImageButton prevWordCard = (ImageButton) findViewById(R.id.prevWordCard);
-		prevWordCard.setOnClickListener(new OnClickListener() {
+	private void setUpPlayButton() {
+		playButton = (ImageButton) findViewById(R.id.playPause);
+		playButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				System.out.println("prev clicked=" + lastIndex);
-				if (lastIndex > 0) {
-					lastIndex--;
-					System.out.println("lastIndex=" + lastIndex);
-					WordCard card = wordCards.get(lastIndex);
-					updateCardDisplay(card);
-				}
+				play();
 			}
 		});
+	}
 
+	private void play() {
+		paused = !paused;
+		setPlayButtonIcon();
+		if (!paused) {
+			// runOnUiThread(new Speaker());
+			new Thread(new Speaker()).start();
+		}
+	}
+
+	private void setPlayButtonIcon() {
+		if (!paused) {
+			playButton.setImageResource(R.drawable.pause);
+		} else {
+			playButton.setImageResource(R.drawable.play);
+		}
+	}
+
+	private void setUpNextButton() {
 		ImageButton nextWordCard = (ImageButton) findViewById(R.id.nextWordCard);
 		nextWordCard.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				System.out.println("next clicked=" + lastIndex);
 				if (lastIndex < wordCards.size()) {
 					lastIndex++;
-					System.out.println("lastIndex=" + lastIndex);
 					WordCard card = wordCards.get(lastIndex);
 					updateCardDisplay(card);
 				}
 			}
 		});
+	}
 
-		ListView listView = (ListView) findViewById(R.id.playlist);
-		registerForContextMenu(listView);
-		listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+	private void setUpPreviousButton() {
+		ImageButton prevWordCard = (ImageButton) findViewById(R.id.prevWordCard);
+		prevWordCard.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
-				if (names.isEmpty()) {
-					Intent intent = new Intent();
-					intent.setClass(PlayerActivity.this, SelectDbDictionaryActivity.class);
-					// intent.putExtra(HelpActivity.CONTENT,
-					// getDictViewContent());
-					// startActivity(intent);
-					intent.putExtra(Constants.NAME_AND_TYPE_ONLY, true);
-					startActivityForResult(intent, REQUEST_CODE_SELECT_DB);
+			public void onClick(View v) {
+				if (lastIndex > 0) {
+					lastIndex--;
+					WordCard card = wordCards.get(lastIndex);
+					updateCardDisplay(card);
 				}
 			}
 		});
-		String[] items = new String[] { "select" };
-		listView.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items));
+	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		super.onActivityResult(requestCode, resultCode, intent);
+		if (REQUEST_CODE_SELECT_DB == requestCode) {
+			if (resultCode == RESULT_OK) {
+				Bundle extras = intent.getExtras();
+				boolean isCategory = extras.getBoolean("isCategory");
+				String returnName = extras.getString("name");
+				String prefix = isCategory ? getResources().getString(R.string.category)
+						: getResources().getString(R.string.dictionary);
+				names.add(prefix + ": " + returnName);
+				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
+						names.toArray(new String[] {})));
+			}
+		}
 	}
 
 	@Override
@@ -142,7 +199,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			@Override
 			public void onDone(String utteranceId) {
 
-//				System.out.println("finished ");
+				// System.out.println("finished ");
 				finishedSpeak = true;
 			}
 
@@ -195,8 +252,8 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			for (int i = lastIndex; i < wordCards.size(); i++) {
 				WordCard card = wordCards.get(i);
 				if (paused) {
-					lastIndex = i;
-					break;
+					lastIndex = i - 1;
+					return;
 				}
 				runOnUiThread(new Runnable() {
 					@Override
@@ -204,16 +261,26 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 						updateCardDisplay(card);
 					}
 				});
-//				System.out.println("lang from=" + getSettingsHolder().getLanguageFrom());
-//				System.out.println("playing word " + card.getWord());
-				updateLanguageSelection(getSettingsHolder().getLanguageFrom());
-				play(card.getWord());
-//				System.out.println("lang to=" + getSettingsHolder().getLanguageTo());
-//				System.out.println("playing translation " + card.getTranslation());
-				updateLanguageSelection(getSettingsHolder().getLanguageTo());
-				play(card.getTranslation());
+				System.out.println("lang isChecked=" + reverse.isChecked());
+				if (reverse.isChecked()) {
+					updateLanguageSelection(getSettingsHolder().getLanguageTo());
+					play(card.getTranslation());
+					updateLanguageSelection(getSettingsHolder().getLanguageFrom());
+					play(card.getWord());
+				} else {
+					updateLanguageSelection(getSettingsHolder().getLanguageFrom());
+					play(card.getWord());
+					updateLanguageSelection(getSettingsHolder().getLanguageTo());
+					play(card.getTranslation());
+				}
 			}
-
+			paused = false;
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					setPlayButtonIcon();
+				}
+			});
 		}
 
 		private void play(String word) {
@@ -221,7 +288,8 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			mTts.speak(word, TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
 			while (!finishedSpeak) {
 				try {
-					System.out.println("waiting, finishedSpeak=" + finishedSpeak);
+					// System.out.println("waiting, finishedSpeak=" +
+					// finishedSpeak);
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
 					e.printStackTrace();

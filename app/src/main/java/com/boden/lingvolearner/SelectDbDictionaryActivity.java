@@ -94,6 +94,41 @@ public class SelectDbDictionaryActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
 
+					List<WordCard> allWordCards = loadFromDB(position);
+
+					Bundle extras = getIntent().getExtras();
+					boolean returnName = extras != null ? extras.getBoolean(Constants.NAME_AND_TYPE_ONLY) : false;
+					System.out.println("return name condition: "+returnName);
+					if (returnName) {
+						Intent returnIntent = new Intent();
+						returnIntent.putExtra("isCategory", categoryOrDictionary.isChecked());
+						String selected = categoryOrDictionary.isChecked()
+								? ContextHolder.getInstance().getCategories()[position]
+								: ContextHolder.getInstance().getDictionaries()[position];
+						String[] selection = selected.split(ID_SEP);
+						returnIntent.putExtra("name", selection[0]);
+						returnIntent.putExtra("id", selection[1]);
+						ContextHolder.getInstance().getLoadedWordCards().add(allWordCards);
+						setResult(Activity.RESULT_OK, returnIntent);
+						System.out.println("returning");
+						finish();
+					} else {
+						boolean isLoaded = allWordCards.size() > 9;
+						if (!isLoaded) {
+							Toast toast = Toast.makeText(getApplicationContext(),
+									getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
+							toast.show();
+						} else {
+							ContextHolder.getInstance().createLearningManager(allWordCards);
+							ContextHolder.getSettingsHolder().setStartFromNumber(0);
+							Intent returnIntent = new Intent();
+							setResult(Activity.RESULT_OK, returnIntent);
+							finish();
+						}
+					}
+				}
+
+				private List<WordCard> loadFromDB(int position) {
 					Cursor cursor;
 					if (categoryOrDictionary.isChecked()) {
 						if (position == 0) {
@@ -118,34 +153,7 @@ public class SelectDbDictionaryActivity extends Activity {
 					if (shuffleSelected) {
 						Collections.shuffle(allWordCards);
 					}
-
-					Bundle extras = getIntent().getExtras();
-					boolean returnName = extras != null ? extras.getBoolean(Constants.NAME_AND_TYPE_ONLY) : false;
-					if (returnName) {
-						Intent returnIntent = new Intent();
-						returnIntent.putExtra("category", categoryOrDictionary.isChecked());
-						String selected = categoryOrDictionary.isChecked()
-								? ContextHolder.getInstance().getCategories()[position]
-								: ContextHolder.getInstance().getDictionaries()[position];
-						String[] selection = selected.split(ID_SEP);
-						returnIntent.putExtra("name", selection[0]);
-						returnIntent.putExtra("id", selection[1]);
-						setResult(Activity.RESULT_OK, returnIntent);
-						finish();
-					} else {
-						boolean isLoaded = allWordCards.size() > 9;
-						if (!isLoaded) {
-							Toast toast = Toast.makeText(getApplicationContext(),
-									getResources().getString(R.string.noWordsFound), Toast.LENGTH_SHORT);
-							toast.show();
-						} else {
-							ContextHolder.getInstance().createLearningManager(allWordCards);
-							ContextHolder.getSettingsHolder().setStartFromNumber(0);
-							Intent returnIntent = new Intent();
-							setResult(Activity.RESULT_OK, returnIntent);
-							finish();
-						}
-					}
+					return allWordCards;
 				}
 			});
 		} catch (SQLiteException e) {

@@ -1,5 +1,6 @@
 package com.boden.lingvolearner.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class ContextHolder {
 	private MediaFilesPlayer mediaFilesPlayer;
 	private String[] categories;
 	private String[] dictionaries;
+	private List<List<WordCard>> loadedWordCards = new ArrayList<>();
 
 	private ContextHolder() {
 		wordSpeaker = new WordSpeaker();
@@ -101,6 +103,14 @@ public class ContextHolder {
 
 	public void setDictionaries(String[] dictionaries) {
 		this.dictionaries = dictionaries;
+	}
+
+	public List<List<WordCard>> getLoadedWordCards() {
+		return loadedWordCards;
+	}
+
+	public void setLoadedWordCards(List<List<WordCard>> loadedWordCards) {
+		this.loadedWordCards = loadedWordCards;
 	}
 
 }

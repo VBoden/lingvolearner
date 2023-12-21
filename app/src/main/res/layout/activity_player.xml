@@ -5,28 +5,30 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-
     <TableLayout
         android:id="@+id/tableLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
+
         <TableRow>
+
             <ImageButton
                 android:id="@+id/prevWordCard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/go_previous"
-                android:padding="10dip"/>
+                android:padding="10dip"
+                android:src="@drawable/go_previous" />
 
             <Space
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:gravity="right"
+                android:orientation="vertical"
                 android:padding="10dip">
 
                 <TextView
@@ -55,10 +57,24 @@
                 android:id="@+id/nextWordCard"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/go_next"
-                android:padding="10dip"/>
+                android:padding="10dip"
+                android:src="@drawable/go_next" />
         </TableRow>
     </TableLayout>
+
+    <TextView
+        android:id="@+id/playing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
+    <Switch
+        android:id="@+id/reverse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/translationsFirst" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -66,16 +82,34 @@
         android:orientation="horizontal">
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/go_previous" />
+            android:src="@drawable/previous" />
 
         <ImageButton
-            android:id="@+id/imageButton2"
+            android:id="@+id/playPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/go_next" />
+            android:src="@drawable/play" />
+
+        <ImageButton
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next" />
+
+        <ImageButton
+            android:id="@+id/repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/repeat" />
+
+        <ImageButton
+            android:id="@+id/add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/addtolist" />
     </LinearLayout>
 
     <ListView
@@ -84,8 +118,4 @@
         android:layout_height="wrap_content"
         android:drawSelectorOnTop="false"></ListView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
 </LinearLayout>

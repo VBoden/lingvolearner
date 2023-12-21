@@ -71,5 +71,6 @@
     <string name="dictionary">Словник</string>
     <string name="randomize">Перемішати слова</string>
     <string name="noWordsFound">Не достатньо слів! Зробіть інший вибір.</string>
+    <string name="translationsFirst">Спочатку переклад</string>
 
 </resources>
