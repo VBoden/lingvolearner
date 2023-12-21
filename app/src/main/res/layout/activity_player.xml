@@ -6,6 +6,60 @@
     android:orientation="vertical">
 
 
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <TableRow>
+            <ImageButton
+                android:id="@+id/prevWordCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/go_previous"
+                android:padding="10dip"/>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="right"
+                android:padding="10dip">
+
+                <TextView
+                    android:id="@+id/word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/translation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textAlignment="center"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <ImageButton
+                android:id="@+id/nextWordCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/go_next"
+                android:padding="10dip"/>
+        </TableRow>
+    </TableLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,14 +78,14 @@
             android:src="@drawable/go_next" />
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
     <ListView
         android:id="@+id/playlist"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:drawSelectorOnTop="false" >
-    </ListView>
+        android:drawSelectorOnTop="false"></ListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world" />
 </LinearLayout>

@@ -3,7 +3,7 @@
     package="com.boden.lingvolearner"
     android:requestLegacyExternalStorage="true"
     android:versionCode="3"
-    android:versionName="2.1">
+    android:versionName="2.2">
     <queries>
         <intent>
             <action android:name="android.intent.action.TTS_SERVICE"/>
