@@ -56,6 +56,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 	private TextToSpeech mTts;
 	private boolean finishedSpeak;
 	private boolean paused = true;
+	private boolean repeat = true;
 	private int lastIndex;
 	private int selectedIndex;
 	private List<String> names = new ArrayList<>();
@@ -76,6 +77,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		mTts = new TextToSpeech(getApplicationContext(), this);
 
 		setUpPlayButton();
+		setUpRepeatButton();
 		setUpAddButton();
 
 		setUpPreviousButton();
@@ -128,6 +130,16 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			// runOnUiThread(new Speaker());
 			new Thread(new Speaker()).start();
 		}
+	}
+
+	private void setUpRepeatButton() {
+		ImageButton repeatButton = (ImageButton) findViewById(R.id.repeat);
+		repeatButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				repeat = !repeat;
+			}
+		});
 	}
 
 	private void setPlayButtonIcon() {
@@ -243,38 +255,50 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 
 		@Override
 		public void run() {
-
-			// finishedSpeak = true;
-
-			if (lastIndex >= wordCards.size()) {
-				lastIndex = 0;
-			}
-			for (int i = lastIndex; i < wordCards.size(); i++) {
-				WordCard card = wordCards.get(i);
-				if (paused) {
-					lastIndex = i - 1;
-					return;
+			do {
+				if (lastIndex >= wordCards.size()) {
+					lastIndex = 0;
 				}
-				runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						updateCardDisplay(card);
+				for (int i = lastIndex; i < wordCards.size(); i++) {
+					WordCard card = wordCards.get(i);
+					if (paused) {
+						lastIndex = i - 1;
+						return;
 					}
-				});
-				System.out.println("lang isChecked=" + reverse.isChecked());
-				if (reverse.isChecked()) {
-					updateLanguageSelection(getSettingsHolder().getLanguageTo());
-					play(card.getTranslation());
-					updateLanguageSelection(getSettingsHolder().getLanguageFrom());
-					play(card.getWord());
-				} else {
-					updateLanguageSelection(getSettingsHolder().getLanguageFrom());
-					play(card.getWord());
-					updateLanguageSelection(getSettingsHolder().getLanguageTo());
-					play(card.getTranslation());
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							updateCardDisplay(card);
+						}
+					});
+					if (reverse.isChecked()) {
+						updateLanguageSelection(getSettingsHolder().getLanguageTo());
+						play(card.getTranslation());
+						updateLanguageSelection(getSettingsHolder().getLanguageFrom());
+						play(card.getWord());
+					} else {
+						updateLanguageSelection(getSettingsHolder().getLanguageFrom());
+						play(card.getWord());
+						updateLanguageSelection(getSettingsHolder().getLanguageTo());
+						play(card.getTranslation());
+					}
+					makePause(200);
 				}
-			}
-			paused = false;
+				if (repeat) {
+					makePause(1000);
+					List<List<WordCard>> loadedWordCards = ContextHolder.getInstance().getLoadedWordCards();
+					selectedIndex = (selectedIndex + 1) % loadedWordCards.size();
+					System.out.println("selectedIndex=" + selectedIndex);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							playing.setText(names.get(selectedIndex));
+						}
+					});
+					wordCards = loadedWordCards.get(selectedIndex);
+				}
+			} while (!paused && repeat);
+			paused = true;
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -283,17 +307,19 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			});
 		}
 
+		private void makePause(int time) {
+			try {
+				Thread.sleep(time);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		private void play(String word) {
 			finishedSpeak = false;
 			mTts.speak(word, TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID);
 			while (!finishedSpeak) {
-				try {
-					// System.out.println("waiting, finishedSpeak=" +
-					// finishedSpeak);
-					Thread.sleep(10);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				makePause(10);
 			}
 		}
 
