@@ -33,18 +33,18 @@
 
                 <TextView
                     android:id="@+id/word"
-                    android:layout_width="wrap_content"
+                    android:layout_width="170dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text=""
-                    android:textAlignment="center"
                     android:textSize="24sp" />
 
                 <TextView
                     android:id="@+id/translation"
-                    android:layout_width="wrap_content"
+                    android:layout_width="170dp"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text=""
-                    android:textAlignment="center"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -103,7 +103,7 @@
             android:id="@+id/repeat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/repeat" />
+            android:src="@drawable/repeat_all" />
 
         <ImageButton
             android:id="@+id/add"

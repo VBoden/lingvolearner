@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -48,15 +49,18 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 
 	private static final int REQUEST_CODE_SELECT_DB = 4;
 
+	private static Map<Integer, Integer> REPEAT_ICON = Map.of(0, R.drawable.repeat_none, 1, R.drawable.repeat1, 2, R.drawable.repeat_all);
+
 	private TextView wordLabel;
 	private TextView translationLabel;
 	private TextView playing;
 	private ImageButton playButton;
+	private ImageButton repeatButton;
 	private Switch reverse;
 	private TextToSpeech mTts;
 	private boolean finishedSpeak;
 	private boolean paused = true;
-	private boolean repeat = true;
+	private int repeat = 2;
 	private int lastIndex;
 	private int selectedIndex;
 	private List<String> names = new ArrayList<>();
@@ -132,16 +136,6 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		}
 	}
 
-	private void setUpRepeatButton() {
-		ImageButton repeatButton = (ImageButton) findViewById(R.id.repeat);
-		repeatButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				repeat = !repeat;
-			}
-		});
-	}
-
 	private void setPlayButtonIcon() {
 		if (!paused) {
 			playButton.setImageResource(R.drawable.pause);
@@ -150,12 +144,27 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		}
 	}
 
+	private void setUpRepeatButton() {
+		repeatButton = (ImageButton) findViewById(R.id.repeat);
+		repeatButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				repeat = (repeat + 1) % 3;
+				setRepeatButtonIcon();
+			}
+		});
+	}
+
+	private void setRepeatButtonIcon() {
+		repeatButton.setImageResource(REPEAT_ICON.get(repeat));
+	}
+
 	private void setUpNextButton() {
 		ImageButton nextWordCard = (ImageButton) findViewById(R.id.nextWordCard);
 		nextWordCard.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (lastIndex < wordCards.size()) {
+				if (lastIndex < wordCards.size() - 1) {
 					lastIndex++;
 					WordCard card = wordCards.get(lastIndex);
 					updateCardDisplay(card);
@@ -284,11 +293,12 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 					}
 					makePause(200);
 				}
-				if (repeat) {
+				if (repeat > 0) {
 					makePause(1000);
 					List<List<WordCard>> loadedWordCards = ContextHolder.getInstance().getLoadedWordCards();
-					selectedIndex = (selectedIndex + 1) % loadedWordCards.size();
-					System.out.println("selectedIndex=" + selectedIndex);
+					if (repeat > 1) {
+						selectedIndex = (selectedIndex + 1) % loadedWordCards.size();
+					}
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -297,7 +307,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 					});
 					wordCards = loadedWordCards.get(selectedIndex);
 				}
-			} while (!paused && repeat);
+			} while (!paused && repeat > 0);
 			paused = true;
 			runOnUiThread(new Runnable() {
 				@Override
