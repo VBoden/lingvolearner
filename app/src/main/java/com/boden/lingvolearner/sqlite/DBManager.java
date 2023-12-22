@@ -19,7 +19,7 @@ public class DBManager {
 
 	private static final String WHERE_AND = "where %s and %s;";
 	private static final String JOIN_DICTIONARY = "left join words_dictionaryentry_dictionary as ed on e.id=ed.dictionaryentry_id ";
-	private static final String SELECT_DICTIONARY_ENTRY = "SELECT w.word,e.transcription,t.word FROM words_dictionaryentry as e join words_word as w on w.id=e.word_id join words_word as t on t.id=e.translation_id ";
+	private static final String SELECT_DICTIONARY_ENTRY = "SELECT w.word,e.transcription,t.word,t.notes FROM words_dictionaryentry as e join words_word as w on w.id=e.word_id join words_word as t on t.id=e.translation_id ";
 	private static final String JOIN_CATEGORY = "left join words_word_category as wc on w.id=wc.word_id ";
 	private static final String TABLE_CATEGORIES = "words_category";
 	private static final String TABLE_DICTIONARIES = "words_dictionary";

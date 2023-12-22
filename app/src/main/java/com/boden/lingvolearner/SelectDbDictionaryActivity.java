@@ -188,7 +188,9 @@ public class SelectDbDictionaryActivity extends Activity {
 		List<WordCard> allWordCards = new ArrayList<>();
 		if (cursor != null && cursor.getCount() > 0) {
 			while (cursor.moveToNext()) {
-				allWordCards.add(new WordCard(cursor.getString(0), cursor.getString(1), cursor.getString(2)));
+				String notesDB = cursor.getString(3);
+				String notes = notesDB != null && notesDB.trim().length() > 0 ? "\n(" + notesDB + ")" : "";
+				allWordCards.add(new WordCard(cursor.getString(0), cursor.getString(1), cursor.getString(2) + notes));
 			}
 		}
 		return allWordCards;
