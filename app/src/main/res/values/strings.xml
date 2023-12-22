@@ -73,4 +73,8 @@
     <string name="noWordsFound">Не достатньо слів! Зробіть інший вибір.</string>
     <string name="translationsFirst">Спочатку переклад</string>
 
+    <string name="context_remove_title">"Видалити елементи"</string>
+    <string name="context_remove">"Видалити "</string>
+    <string name="context_remove_all">"Видалити все"</string>
+
 </resources>

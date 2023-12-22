@@ -68,13 +68,17 @@
         android:layout_height="wrap_content"
         android:text=""
         android:textAlignment="center"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:padding="10dip"
+        android:paddingBottom="20dip" />
 
     <Switch
         android:id="@+id/reverse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/translationsFirst" />
+        android:text="@string/translationsFirst"
+        android:padding="10dip"
+        android:paddingBottom="50dip"/>
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -29,7 +29,9 @@ import android.speech.tts.UtteranceProgressListener;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -102,6 +104,41 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		});
 		String[] items = new String[] { "not selected yet" };
 		playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items));
+	}
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+		menu.setHeaderTitle(R.string.context_remove_title);
+		ListView lv = (ListView) v;
+		AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
+		int index = acmi.position;
+		String obj = (String) lv.getItemAtPosition(acmi.position);
+		menu.add(getResources().getString(R.string.context_remove) + obj).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				names.remove(index);
+				ContextHolder.getInstance().getLoadedWordCards().remove(index);
+				wordCards.clear();
+				selectedIndex = 0;
+				lastIndex = 0;
+				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
+						names.toArray(new String[] {})));
+				return true;
+			}
+		});
+		menu.add(R.string.context_remove_all).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				names.clear();
+				ContextHolder.getInstance().getLoadedWordCards().clear();
+				wordCards.clear();
+				selectedIndex = 0;
+				lastIndex = 0;
+				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
+						names.toArray(new String[] {})));
+				return true;
+			}
+		});
 	}
 
 	private void setUpAddButton() {
