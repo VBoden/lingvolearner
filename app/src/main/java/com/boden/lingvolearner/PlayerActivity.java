@@ -60,13 +60,14 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 	private ImageButton repeatButton;
 	private Switch reverse;
 	private TextToSpeech mTts;
-	private boolean finishedSpeak;
+	private boolean finishedSpeak = true;
+	private boolean playingList = false;
 	private boolean paused = true;
 	private int repeat = 2;
 	private int lastIndex;
 	private int selectedIndex;
 	private List<String> names = new ArrayList<>();
-	private List<WordCard> wordCards = ContextHolder.getAllWordCards();
+	private List<WordCard> wordCards = new ArrayList<>();
 
 	private ListView playList;
 
@@ -95,9 +96,15 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
 				if (!names.isEmpty()) {
+					if(!paused){
+						paused=true;
+						do {
+							makePause(10);
+						} while (playingList);
+					}
 					selectedIndex = position;
 					playing.setText(names.get(position));
-					wordCards = ContextHolder.getInstance().getLoadedWordCards().get(position);
+					wordCards = new ArrayList<>(ContextHolder.getInstance().getLoadedWordCards().get(position));
 					play();
 				}
 			}
@@ -297,6 +304,14 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		super.onDestroy();
 	}
 
+	private void makePause(int time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 	class Speaker implements Runnable {
 
 		@Override
@@ -305,10 +320,12 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 				if (lastIndex >= wordCards.size()) {
 					lastIndex = 0;
 				}
+				playingList = true;
 				for (int i = lastIndex; i < wordCards.size(); i++) {
 					WordCard card = wordCards.get(i);
 					if (paused) {
 						lastIndex = i - 1;
+						playingList = false;
 						return;
 					}
 					runOnUiThread(new Runnable() {
@@ -342,7 +359,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 							playing.setText(names.get(selectedIndex));
 						}
 					});
-					wordCards = loadedWordCards.get(selectedIndex);
+					wordCards = new ArrayList<>(loadedWordCards.get(selectedIndex));
 				}
 			} while (!paused && repeat > 0);
 			paused = true;
@@ -352,14 +369,6 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 					setPlayButtonIcon();
 				}
 			});
-		}
-
-		private void makePause(int time) {
-			try {
-				Thread.sleep(time);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 		}
 
 		private void play(String word) {
