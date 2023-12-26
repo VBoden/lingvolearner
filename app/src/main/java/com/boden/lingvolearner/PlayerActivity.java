@@ -71,6 +71,8 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 
 	private ListView playList;
 
+	private ArrayAdapter<String> listAdapter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -93,15 +95,16 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		setUpNextButton();
 
 		playList = (ListView) findViewById(R.id.playlist);
-		registerForContextMenu(playList);
 		playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
 				playAnother(position);
 			}
 		});
-		String[] items = new String[] { "not selected yet" };
-		playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items));
+		List<String> items = new ArrayList<>();
+		listAdapter = new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items);
+		playList.setAdapter(listAdapter);
+		registerForContextMenu(playList);
 	}
 
 	private void playAnother(int position) {
@@ -121,11 +124,36 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-		menu.setHeaderTitle(R.string.context_remove_title);
+		menu.setHeaderTitle(R.string.context_playlist_title);
 		ListView lv = (ListView) v;
 		AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) menuInfo;
 		int index = acmi.position;
 		String obj = (String) lv.getItemAtPosition(acmi.position);
+
+		List<List<WordCard>> loadedWordCards = ContextHolder.getInstance().getLoadedWordCards();
+		MenuItem menuUp = menu.add(R.string.context_moveUp);
+		menuUp.setEnabled(index > 0);
+		menuUp.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				if (index > 0) {
+					switchListEmements(index, index - 1, loadedWordCards);
+				}
+				return true;
+			}
+		});
+		MenuItem menuDown = menu.add(R.string.context_moveDown);
+		menuDown.setEnabled(index + 1 < loadedWordCards.size());
+		menuDown.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				if (index + 1 < loadedWordCards.size()) {
+					switchListEmements(index, index + 1, loadedWordCards);
+				}
+				return true;
+			}
+		});
+
 		menu.add(getResources().getString(R.string.context_remove) + obj).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
@@ -134,8 +162,7 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 				wordCards.clear();
 				selectedIndex = 0;
 				lastIndex = 0;
-				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
-						names.toArray(new String[] {})));
+				listAdapter.remove(listAdapter.getItem(index));
 				return true;
 			}
 		});
@@ -147,11 +174,24 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 				wordCards.clear();
 				selectedIndex = 0;
 				lastIndex = 0;
-				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
-						names.toArray(new String[] {})));
+				listAdapter.clear();
 				return true;
 			}
 		});
+	}
+
+	private void switchListEmements(int index, int newIndex, List<List<WordCard>> loadedWordCards) {
+		String listItem = names.get(index);
+		names.remove(index);
+		names.add(newIndex, listItem);
+		List<WordCard> cards = loadedWordCards.get(index);
+		loadedWordCards.remove(index);
+		loadedWordCards.add(newIndex, cards);
+		wordCards.clear();
+		selectedIndex = 0;
+		lastIndex = 0;
+		listAdapter.remove(listAdapter.getItem(index));
+		listAdapter.insert(listItem, newIndex);
 	}
 
 	private void setUpAddButton() {
@@ -181,7 +221,6 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		paused = !paused;
 		setPlayButtonIcon();
 		if (!paused) {
-			// runOnUiThread(new Speaker());
 			new Thread(new Speaker()).start();
 		}
 	}
@@ -270,9 +309,9 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 				String returnName = extras.getString("name");
 				String prefix = isCategory ? getResources().getString(R.string.category)
 						: getResources().getString(R.string.dictionary);
-				names.add(prefix + ": " + returnName);
-				playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item,
-						names.toArray(new String[] {})));
+				String listItem = prefix + ": " + returnName;
+				names.add(listItem);
+				listAdapter.add(listItem);
 			}
 		}
 	}
