@@ -83,7 +83,9 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 
 		mTts = new TextToSpeech(getApplicationContext(), this);
 
+		setUpPlayPrevButton();
 		setUpPlayButton();
+		setUpPlayNextButton();
 		setUpRepeatButton();
 		setUpAddButton();
 
@@ -95,22 +97,26 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View itemClicked, int position, long id) {
-				if (!names.isEmpty()) {
-					if(!paused){
-						paused=true;
-						do {
-							makePause(10);
-						} while (playingList);
-					}
-					selectedIndex = position;
-					playing.setText(names.get(position));
-					wordCards = new ArrayList<>(ContextHolder.getInstance().getLoadedWordCards().get(position));
-					play();
-				}
+				playAnother(position);
 			}
 		});
 		String[] items = new String[] { "not selected yet" };
 		playList.setAdapter(new ArrayAdapter<String>(PlayerActivity.this, R.layout.list_item, items));
+	}
+
+	private void playAnother(int position) {
+		if (!names.isEmpty()) {
+			if(!paused){
+				paused=true;
+				do {
+					makePause(10);
+				} while (playingList);
+			}
+			selectedIndex = position;
+			playing.setText(names.get(position));
+			wordCards = new ArrayList<>(ContextHolder.getInstance().getLoadedWordCards().get(position));
+			play();
+		}
 	}
 
 	@Override
@@ -186,6 +192,30 @@ public class PlayerActivity extends Activity implements TextToSpeech.OnInitListe
 		} else {
 			playButton.setImageResource(R.drawable.play);
 		}
+	}
+
+	private void setUpPlayPrevButton() {
+		ImageButton button = (ImageButton) findViewById(R.id.previous);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int index = selectedIndex > 0 ? selectedIndex - 1
+						: ContextHolder.getInstance().getLoadedWordCards().size() - 1;
+				playAnother(index);
+			}
+		});
+	}
+
+	private void setUpPlayNextButton() {
+		ImageButton button = (ImageButton) findViewById(R.id.next);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int totalInList = ContextHolder.getInstance().getLoadedWordCards().size();
+				int index = selectedIndex < totalInList - 1 ? selectedIndex + 1 : 0;
+				playAnother(index);
+			}
+		});
 	}
 
 	private void setUpRepeatButton() {
