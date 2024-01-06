@@ -12,12 +12,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public static final String SUBJECT = "subject";
 	public static final String DESC = "description";
 
-	public static final String DB_NAME = "prod-db.sqlite3";
+	public static final String DB_NAME = "lingvoLearner-db.sqlite3";
 
 	static final int DB_VERSION = 1;
 
 	private static final String CREATE_TABLE = "create table " + TABLE_NAME + "(" + _ID
 			+ " INTEGER PRIMARY KEY AUTOINCREMENT, " + SUBJECT + " TEXT NOT NULL, " + DESC + " TEXT);";
+
 
 	public DatabaseHelper(Context context) {
 		super(context, DB_NAME, null, DB_VERSION);

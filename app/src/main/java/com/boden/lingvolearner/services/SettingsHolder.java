@@ -49,7 +49,7 @@ public class SettingsHolder {
 		languageTo = userPrefs.getString(LANGUAGE_TO, "uk");
 		useTtsToSay = userPrefs.getBoolean(USE_TTS_TO_SAY, true);
 		usedTts = userPrefs.getInt(USED_TTS, 1);
-		useFilesToSay = userPrefs.getBoolean(USE_FILES_TO_SAY, true);
+		useFilesToSay = userPrefs.getBoolean(USE_FILES_TO_SAY, false);
 		pathToSoundFiles = userPrefs.getString(PATH_TO_SOUND_FILES, "");
 		categoriesDisplaySelected = userPrefs.getBoolean(CATEGORIES_DISPLAY_SELECTED, true);
 		shuffleWords = userPrefs.getBoolean(SHUFFLE_WORDS, true);

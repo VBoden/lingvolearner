@@ -107,7 +107,7 @@ public class DBManager {
 		return cursor;
 	}
 
-	public void copyDBfile(Uri uri, InputStream inputStream) throws FileNotFoundException, IOException {
+	public void copyDBfile(InputStream inputStream) throws FileNotFoundException, IOException {
 		String dbPath = "/data/data/" + context.getApplicationContext().getPackageName() + "/databases/"
 				+ DatabaseHelper.DB_NAME;
 		File dbFile = new File(dbPath);

@@ -281,8 +281,9 @@ public class OptionActivity extends GeneralMainActivity {
 			if (resultCode == RESULT_OK) {
 				Uri uri = data.getData();
 				DBManager dbManager = new DBManager(this);
+				dbManager.close();
 				try {
-					dbManager.copyDBfile(uri, getContentResolver().openInputStream(uri));
+					dbManager.copyDBfile(getContentResolver().openInputStream(uri));
 					Toast toast = Toast.makeText(getApplicationContext(), "Базу успішно оновлено.", Toast.LENGTH_SHORT);
 					toast.show();
 				} catch (IOException e) {

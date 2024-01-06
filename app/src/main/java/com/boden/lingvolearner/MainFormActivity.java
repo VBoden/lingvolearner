@@ -3,6 +3,7 @@ package com.boden.lingvolearner;
 import static com.boden.lingvolearner.services.ContextHolder.getLearningManager;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -11,6 +12,8 @@ import com.boden.lingvolearner.pojo.WordCard;
 import com.boden.lingvolearner.services.ContextHolder;
 import com.boden.lingvolearner.services.DictionaryFileManipulator;
 import com.boden.lingvolearner.services.Stage;
+import com.boden.lingvolearner.sqlite.DBManager;
+import com.boden.lingvolearner.sqlite.DatabaseHelper;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -19,6 +22,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
@@ -61,8 +65,26 @@ public class MainFormActivity extends GeneralMainActivity {
 		ContextHolder.setWordPlayer(player);
 		ContextHolder.setMediaFilesPlayer(new AndroidMediaFilesPlayer());
 
+		copyDefaultDbIfNotPresent();
 		selectDictionaryFromDB();
 		// startDictFileSelection();
+	}
+
+	private void copyDefaultDbIfNotPresent() {
+		DBManager dbManager = new DBManager(this);
+		try {
+			dbManager.open();
+			dbManager.fetchLanguages();
+		} catch (android.database.sqlite.SQLiteException sqe) {
+			dbManager.close();
+			InputStream myInput;
+			try {
+				myInput = getAssets().open(DatabaseHelper.DB_NAME);
+				dbManager.copyDBfile(myInput);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public Menu getMenu() {
@@ -160,9 +182,9 @@ public class MainFormActivity extends GeneralMainActivity {
 		case R.id.menu_dict_preview:
 			previewWholeDcitionary();
 			return true;
-//		case R.id.menu_last_opend:
-//			lastOpened();
-//			return true;
+		// case R.id.menu_last_opend:
+		// lastOpened();
+		// return true;
 		case R.id.menu_next_step:
 			if (getLearningManager().getCurrentStage().isLast()) {
 				ContextHolder.getUiUpdator(getLearningManager().getCurrentStage().getNext()).createNewActivity();
@@ -209,15 +231,15 @@ public class MainFormActivity extends GeneralMainActivity {
 		System.out.println("setting closed");// ???????????
 	}
 
-//	private void lastOpened() {
-//		Intent theIntent = new Intent();
-//		theIntent.setClass(MainFormActivity.this, LastOpendActivity.class);
-//		try {
-//			startActivityForResult(theIntent, REQUEST_CODE_LAST_OPEND_ACTIVITY);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	// private void lastOpened() {
+	// Intent theIntent = new Intent();
+	// theIntent.setClass(MainFormActivity.this, LastOpendActivity.class);
+	// try {
+	// startActivityForResult(theIntent, REQUEST_CODE_LAST_OPEND_ACTIVITY);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
 
 	private void help() {
 		Intent intent = new Intent();
@@ -255,6 +277,7 @@ public class MainFormActivity extends GeneralMainActivity {
 	}
 
 	private void selectDictionaryFromDB() {
+
 		Intent intent = new Intent();
 		intent.setClass(MainFormActivity.this, SelectDbDictionaryActivity.class);
 		// intent.putExtra(HelpActivity.CONTENT, getDictViewContent());
