@@ -128,9 +128,11 @@ public class MainFormUiUpdator implements UiUpdator {
 		mainActivity.setTitle(R.string.app_name2);
 
 		Vword = (TextView) mainActivity.findViewById(R.id.word);
+		Vword.setText(R.string.selectdict);
 		Vword.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				getLearningManager().playOnClick();
+				if (getLearningManager() != null)
+					getLearningManager().playOnClick();
 			}
 		});
 		Vtransc = (TextView) mainActivity.findViewById(R.id.transcription);

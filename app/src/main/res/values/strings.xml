@@ -8,7 +8,7 @@
      <string name="app_name">Лінгво-зубрилка</string>
     <string name="app_name2">Лінгво-зубрилка: переклад слів</string>
     <string name="app_name3">Лінгво-зубрилка: написання слів</string>
-    <string name="selectdict">виберіть словник</string>
+    <string name="selectdict">Не вибрано слів для вивчення</string>
     <string name="words">"слова "</string>
     <string name="end_of_dict">"Досягнуто кінця словника. Вивчення буде розпочато з початку"</string>
     <string name="prev_step">"Попередній етап"</string>
@@ -42,8 +42,8 @@
     <string name="select">"Вибрати"</string>
     
     
-    <string name="open_db">Вибрати набір слів</string>
-    <string name="open">Вибрати словник</string>
+    <string name="open_db">Вибрати набір слів із БД</string>
+    <string name="open">Вибрати файл словника</string>
     <string name="option_kilk">Повторювати слова (кількість раз):</string>
     <string name="option_use_TTS">Промовляти слова, використовуючи TTS</string>
     <string name="option_use_GoogleTTS">Google TTS</string>
@@ -73,7 +73,9 @@
     <string name="noWordsFound">Не достатньо слів! Зробіть інший вибір.</string>
     <string name="translationsFirst">Спочатку переклад</string>
 
-    <string name="context_remove_title">"Видалити елементи"</string>
+    <string name="context_playlist_title">"Змінити список"</string>
+    <string name="context_moveUp">"Перемістити вище"</string>
+    <string name="context_moveDown">"Перемістити нижче"</string>
     <string name="context_remove">"Видалити "</string>
     <string name="context_remove_all">"Видалити все"</string>
 

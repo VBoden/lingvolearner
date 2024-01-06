@@ -28,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 @TargetApi(30)
@@ -104,7 +105,8 @@ public class MainFormActivity extends GeneralMainActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case REQUEST_CODE_OPTION_ACTIVITY:
-			getLearningManager().startLearning();
+			if (getLearningManager() != null)
+				getLearningManager().startLearning();
 			break;
 		case REQUEST_CODE_SELECTDICT:
 			if (resultCode == RESULT_OK) {
