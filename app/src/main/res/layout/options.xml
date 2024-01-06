@@ -62,19 +62,6 @@
         android:text="@string/option_use_FliteTTS" />
 </RadioGroup>
 
-    <TextView
-        android:id="@+id/languageLabel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/option_language_label" />
-
-    <Spinner
-        android:id="@+id/languageSelector"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"/>
-
     <CheckBox
         android:id="@+id/checkBox2"
         android:layout_width="wrap_content"
