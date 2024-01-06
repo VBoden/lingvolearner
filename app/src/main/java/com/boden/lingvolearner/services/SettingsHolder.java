@@ -7,7 +7,7 @@ import com.boden.lingvolearner.pojo.Dict;
 
 public class SettingsHolder {
 	public static final String REPEAT_COUNT = "repeatCount";
-	public static final String DICTIONARIES = "dictionaries";
+//	public static final String DICTIONARIES = "dictionaries";
 	public static final String TEXT_SIZE = "textSize";
 	public static final String TEXT_PADDING = "textPadding";
 	public static final String USE_TTS_TO_SAY = "useTtsToSay";
@@ -33,7 +33,7 @@ public class SettingsHolder {
 
 	private String languageFrom;
 	private String languageTo;
-	private Dict dict;
+//	private Dict dict;
 	private ArrayList<Dict> listOfDicts = new ArrayList<>();
 
 	public SettingsHolder(UserPreferences userPrefs) {
@@ -54,35 +54,35 @@ public class SettingsHolder {
 		categoriesDisplaySelected = userPrefs.getBoolean(CATEGORIES_DISPLAY_SELECTED, true);
 		shuffleWords = userPrefs.getBoolean(SHUFFLE_WORDS, true);
 
-		getDictsFromSettings();
-		if (userPrefs.contains(DICTIONARIES) == true) {
-			String s = userPrefs.getString(DICTIONARIES, "");
-			if (s.length() > 0) {
-				// Log.i("DEBUG_INFO_MY", "length>0");
-				dict = new Dict(s.substring(s.indexOf("<dict>") + 6, s.indexOf("</dict>")));
-				// Log.i("DEBUG_INFO_MY", "was created Dict");
-
-				startFromNumber = dict.getBeginFrom();
-				// Log.i("DEBUG_INFO_MY", "now started loadDict");
-
-			}
-		}
+//		getDictsFromSettings();
+//		if (userPrefs.contains(DICTIONARIES) == true) {
+//			String s = userPrefs.getString(DICTIONARIES, "");
+//			if (s.length() > 0) {
+//				// Log.i("DEBUG_INFO_MY", "length>0");
+//				dict = new Dict(s.substring(s.indexOf("<dict>") + 6, s.indexOf("</dict>")));
+//				// Log.i("DEBUG_INFO_MY", "was created Dict");
+//
+//				startFromNumber = dict.getBeginFrom();
+//				// Log.i("DEBUG_INFO_MY", "now started loadDict");
+//
+//			}
+//		}
 	}
 
-	private void getDictsFromSettings() {
-		// Log.i("DEBUG_LastOpend", "getted settings");
-		if (userPrefs.contains(DICTIONARIES) == true) {
-			String s = userPrefs.getString(DICTIONARIES, "");
-			StringBuffer sb = new StringBuffer(s);
-			while (sb.length() > 0) {
-				Dict dict = new Dict(sb.substring(sb.indexOf("<dict>") + 6, sb.indexOf("</dict>")));
-				if (!listOfDicts.contains(dict)) {
-					listOfDicts.add(dict);
-				}
-				sb.delete(0, sb.indexOf("</dict>") + 7);
-			}
-		}
-	}
+//	private void getDictsFromSettings() {
+//		// Log.i("DEBUG_LastOpend", "getted settings");
+//		if (userPrefs.contains(DICTIONARIES) == true) {
+//			String s = userPrefs.getString(DICTIONARIES, "");
+//			StringBuffer sb = new StringBuffer(s);
+//			while (sb.length() > 0) {
+//				Dict dict = new Dict(sb.substring(sb.indexOf("<dict>") + 6, sb.indexOf("</dict>")));
+//				if (!listOfDicts.contains(dict)) {
+//					listOfDicts.add(dict);
+//				}
+//				sb.delete(0, sb.indexOf("</dict>") + 7);
+//			}
+//		}
+//	}
 
 //	public void updateLastDictionary(String uriPath, String uriString) {
 //		System.out.println("uri=" + uriString);
@@ -217,9 +217,9 @@ public class SettingsHolder {
 		userPrefs.saveInt(REPEAT_COUNT, repeatCount);
 	}
 
-	public Dict getDict() {
-		return dict;
-	}
+//	public Dict getDict() {
+//		return dict;
+//	}
 
 	public ArrayList<Dict> getListOfDicts() {
 		return listOfDicts;
