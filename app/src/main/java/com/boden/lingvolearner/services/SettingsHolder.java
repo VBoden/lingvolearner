@@ -16,7 +16,6 @@ public class SettingsHolder {
 	public static final String CATEGORIES_DISPLAY_SELECTED = "categoriesDisplaySelected";
 	public static final String SHUFFLE_WORDS = "shuffleWords";
 	public static final String PATH_TO_SOUND_FILES = "pathToSoundFiles";
-	public static final String LANGUAGE = "ttsLanguage";
 	public static final String LANGUAGE_FROM = "languageFrom";
 	public static final String LANGUAGE_TO = "languageTo";
 
@@ -32,7 +31,6 @@ public class SettingsHolder {
 	private boolean categoriesDisplaySelected;
 	private boolean shuffleWords;
 
-	private String language;
 	private String languageFrom;
 	private String languageTo;
 	private Dict dict;
@@ -47,7 +45,6 @@ public class SettingsHolder {
 		textSize = userPrefs.getFloat(TEXT_SIZE, 20);
 		textPadding = userPrefs.getInt(TEXT_PADDING, 10);
 		repeatCount = userPrefs.getInt(REPEAT_COUNT, 5);
-		language = userPrefs.getString(LANGUAGE, Locale.US.getLanguage());
 		languageFrom = userPrefs.getString(LANGUAGE_FROM, Locale.US.getLanguage());
 		languageTo = userPrefs.getString(LANGUAGE_TO, "uk");
 		useTtsToSay = userPrefs.getBoolean(USE_TTS_TO_SAY, true);
@@ -226,15 +223,6 @@ public class SettingsHolder {
 
 	public ArrayList<Dict> getListOfDicts() {
 		return listOfDicts;
-	}
-
-	public String getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(String languageTag) {
-		language = languageTag;
-		userPrefs.saveString(LANGUAGE, languageTag);
 	}
 
 	public String getLanguageFrom() {

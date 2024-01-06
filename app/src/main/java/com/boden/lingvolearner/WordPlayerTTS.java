@@ -23,7 +23,7 @@ public class WordPlayerTTS implements WordPlayer, TextToSpeech.OnInitListener {
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
-			updateLanguageSelection(getSettingsHolder().getLanguage());
+			updateLanguageSelection(getSettingsHolder().getLanguageFrom());
 		} else {
 			// Log.e(TAG, "Could not initialize TextToSpeech.");
 		}
@@ -39,7 +39,7 @@ public class WordPlayerTTS implements WordPlayer, TextToSpeech.OnInitListener {
 				mTts = new TextToSpeech(context, this, "edu.cmu.cs.speech.tts.flite");
 			}
 		}
-		updateLanguageSelection(getSettingsHolder().getLanguage());
+		updateLanguageSelection(getSettingsHolder().getLanguageFrom());
 	}
 
 	@Override
