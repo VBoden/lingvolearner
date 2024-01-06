@@ -182,7 +182,7 @@ public class LastOpendActivity extends GeneralMainActivity {
 						listOfDicts.get(positionInList).setName(newName);
 					}
 
-					ContextHolder.getSettingsHolder().saveChangedDictsList();
+//					ContextHolder.getSettingsHolder().saveChangedDictsList();
 					dialog.dismiss();
 					LastOpendActivity.this.removeDialog(IDD_RENAME);
 					// return;

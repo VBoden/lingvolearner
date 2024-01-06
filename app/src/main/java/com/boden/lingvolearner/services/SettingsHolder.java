@@ -84,40 +84,40 @@ public class SettingsHolder {
 		}
 	}
 
-	public void updateLastDictionary(String uriPath, String uriString) {
-		System.out.println("uri=" + uriString);
-		String[] segments = uriPath.split("/");
-		for (String segment : segments) {
-			System.out.println("segment=" + segment);
-		}
-		System.out.println("==========");
-		Dict newDict = new Dict(uriString, segments[segments.length - 1]);
-		if (listOfDicts.contains(newDict)) {
-			int index = listOfDicts.indexOf(newDict);
-			startFromNumber = listOfDicts.get(index).getBeginFrom();
-			newDict.setBeginFrom(startFromNumber);
-			listOfDicts.remove(index);
-		}else{
-			startFromNumber = 0;
-		}
-		listOfDicts.add(0, newDict);
-		saveChangedDictsList();
-	}
+//	public void updateLastDictionary(String uriPath, String uriString) {
+//		System.out.println("uri=" + uriString);
+//		String[] segments = uriPath.split("/");
+//		for (String segment : segments) {
+//			System.out.println("segment=" + segment);
+//		}
+//		System.out.println("==========");
+//		Dict newDict = new Dict(uriString, segments[segments.length - 1]);
+//		if (listOfDicts.contains(newDict)) {
+//			int index = listOfDicts.indexOf(newDict);
+//			startFromNumber = listOfDicts.get(index).getBeginFrom();
+//			newDict.setBeginFrom(startFromNumber);
+//			listOfDicts.remove(index);
+//		}else{
+//			startFromNumber = 0;
+//		}
+//		listOfDicts.add(0, newDict);
+//		saveChangedDictsList();
+//	}
 
-	public void updateDictionatyStartNumber(int startFromNumber) {
-		listOfDicts.get(0).setBeginFrom(startFromNumber);
-		saveChangedDictsList();
-	}
+//	public void updateDictionatyStartNumber(int startFromNumber) {
+//		listOfDicts.get(0).setBeginFrom(startFromNumber);
+//		saveChangedDictsList();
+//	}
 
-	public void saveChangedDictsList() {
-		StringBuffer dictionaries = new StringBuffer();
-		for (int i = 0; i < listOfDicts.size(); i++) {
-			dictionaries.append(listOfDicts.get(i).toString());
-		}
-
-		userPrefs.saveString(DICTIONARIES, dictionaries.toString());
-
-	}
+//	public void saveChangedDictsList() {
+//		StringBuffer dictionaries = new StringBuffer();
+//		for (int i = 0; i < listOfDicts.size(); i++) {
+//			dictionaries.append(listOfDicts.get(i).toString());
+//		}
+//
+//		userPrefs.saveString(DICTIONARIES, dictionaries.toString());
+//
+//	}
 
 	public void updateStartNumber(int startFromNumber) {
 		int totalWords = ContextHolder.getLearningManager().getTotalWordsCount();
@@ -125,7 +125,7 @@ public class SettingsHolder {
 			startFromNumber = totalWords - 10;
 		}
 		this.startFromNumber = startFromNumber;
-		updateDictionatyStartNumber(startFromNumber);
+//		updateDictionatyStartNumber(startFromNumber);
 	}
 
 	public void decreaseTextSize() {

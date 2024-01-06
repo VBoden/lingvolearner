@@ -151,7 +151,7 @@ public class MainFormActivity extends GeneralMainActivity {
 			// getContentResolver().takePersistableUriPermission(uri, 0);
 			List<WordCard> allWordCards = DictionaryFileManipulator
 					.loadDictionaryByLines(getContentResolver().openInputStream(uri));
-			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
+//			ContextHolder.getSettingsHolder().updateLastDictionary(uri.getPath(), uri.toString());
 			ContextHolder.getInstance().createLearningManager(allWordCards);
 			getLearningManager().startLearning();
 		} catch (Exception e) {
