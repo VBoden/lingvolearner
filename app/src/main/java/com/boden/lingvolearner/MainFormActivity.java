@@ -158,9 +158,9 @@ public class MainFormActivity extends GeneralMainActivity {
 		case R.id.menu_dict_preview:
 			previewWholeDcitionary();
 			return true;
-		case R.id.menu_last_opend:
-			lastOpened();
-			return true;
+//		case R.id.menu_last_opend:
+//			lastOpened();
+//			return true;
 		case R.id.menu_next_step:
 			if (getLearningManager().getCurrentStage().isLast()) {
 				ContextHolder.getUiUpdator(getLearningManager().getCurrentStage().getNext()).createNewActivity();
@@ -207,15 +207,15 @@ public class MainFormActivity extends GeneralMainActivity {
 		System.out.println("setting closed");// ???????????
 	}
 
-	private void lastOpened() {
-		Intent theIntent = new Intent();
-		theIntent.setClass(MainFormActivity.this, LastOpendActivity.class);
-		try {
-			startActivityForResult(theIntent, REQUEST_CODE_LAST_OPEND_ACTIVITY);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	private void lastOpened() {
+//		Intent theIntent = new Intent();
+//		theIntent.setClass(MainFormActivity.this, LastOpendActivity.class);
+//		try {
+//			startActivityForResult(theIntent, REQUEST_CODE_LAST_OPEND_ACTIVITY);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private void help() {
 		Intent intent = new Intent();

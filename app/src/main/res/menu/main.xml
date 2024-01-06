@@ -32,11 +32,11 @@
        android:orderInCategory="100"
        android:showAsAction="never"
        android:title="@string/open"/>
-    <item
+<!--    <item
         android:id="@+id/menu_last_opend"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="@string/last_opend"/>
+        android:title="@string/last_opend"/>-->
     <item
         android:id="@+id/menu_settings"
         android:orderInCategory="100"

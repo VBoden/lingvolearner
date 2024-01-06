@@ -45,7 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/option_use_TTS" />
-<RadioGroup
+<!--<RadioGroup
         android:id="@+id/tts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
@@ -94,7 +94,7 @@
             android:layout_toLeftOf="@id/but"
             android:singleLine="true"
             android:text="" />
-    </RelativeLayout>
+    </RelativeLayout>-->
 
     <Button
         android:id="@+id/updateDB"

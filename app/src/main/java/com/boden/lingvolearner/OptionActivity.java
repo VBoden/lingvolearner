@@ -39,15 +39,16 @@ import android.widget.Toast;
 
 public class OptionActivity extends GeneralMainActivity {
 	public static final String EXT_NAME_DIR = "dirName";
-	private static final int REQUEST_CODE_SELECT_DIR = 0;
+//	private static final int REQUEST_CODE_SELECT_DIR = 0;
 	private static final int REQUEST_CODE_SELECT_DB = 1;
-	private static final int USE_GOOGLE_TTS = 1;
+//	private static final int USE_GOOGLE_TTS = 1;
 	private static final int USE_FLITE_TTS = 2;
 
-	private EditText pathToSoundFilesField, edit2;
-	private RadioButton radioButton1;
-	private RadioButton radioButton2;
-	private Button button;
+//	private EditText pathToSoundFilesField;
+//	private RadioButton radioButton1;
+//	private RadioButton radioButton2;
+//	private Button button;
+	private EditText edit2;
 	private List<String> languages = new ArrayList<>();
 	private List<String> languageCodes = new ArrayList<>();
 
@@ -56,25 +57,25 @@ public class OptionActivity extends GeneralMainActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.options);
 		setUpLanguagesSelectors();
-		setUpPathToSoundFiles();
+//		setUpPathToSoundFiles();
 		setUpRepeatCountField();
-		setUpTTSSelection();
+//		setUpTTSSelection();
 		setUpCheckBoxUseTts();
 
-		button = (Button) findViewById(R.id.but);
-		button.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent();
-				intent.setClass(OptionActivity.this, SelectDirActivity.class);
-				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR,
-				// pathToSoundFiles);
-				startActivityForResult(intent, REQUEST_CODE_SELECT_DIR);
-
-			}
-		});
+//		button = (Button) findViewById(R.id.but);
+//		button.setOnClickListener(new OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				Intent intent = new Intent();
+//				intent.setClass(OptionActivity.this, SelectDirActivity.class);
+//				// intent.putExtra(SelectDirActivity.EXT_NAME_DIR,
+//				// pathToSoundFiles);
+//				startActivityForResult(intent, REQUEST_CODE_SELECT_DIR);
+//
+//			}
+//		});
 		setUpUpdateDB();
-		setUpCheckBoxUseFiles();
+//		setUpCheckBoxUseFiles();
 	}
 
 	private void setUpUpdateDB() {
@@ -154,24 +155,24 @@ public class OptionActivity extends GeneralMainActivity {
 		}
 	}
 
-	private void setUpPathToSoundFiles() {
-		pathToSoundFilesField = (EditText) findViewById(R.id.edit1);
-		pathToSoundFilesField.setText(getSettingsHolder().getPathToSoundFiles());
-		pathToSoundFilesField.addTextChangedListener(new TextWatcher() {
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				getSettingsHolder().setPathToSoundFiles(pathToSoundFilesField.getText().toString());
-			}
-		});
-	}
+//	private void setUpPathToSoundFiles() {
+//		pathToSoundFilesField = (EditText) findViewById(R.id.edit1);
+//		pathToSoundFilesField.setText(getSettingsHolder().getPathToSoundFiles());
+//		pathToSoundFilesField.addTextChangedListener(new TextWatcher() {
+//			@Override
+//			public void onTextChanged(CharSequence s, int start, int before, int count) {
+//			}
+//
+//			@Override
+//			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//			}
+//
+//			@Override
+//			public void afterTextChanged(Editable s) {
+//				getSettingsHolder().setPathToSoundFiles(pathToSoundFilesField.getText().toString());
+//			}
+//		});
+//	}
 
 	private void setUpRepeatCountField() {
 		edit2 = (EditText) findViewById(R.id.edit2);
@@ -197,85 +198,85 @@ public class OptionActivity extends GeneralMainActivity {
 		});
 	}
 
-	private void setUpTTSSelection() {
-		OnClickListener radioButtonOnClick = new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				int number = 1;
-				if (v.getId() == R.id.radioButton1) {
-					number = USE_GOOGLE_TTS;
-					Toast toast = Toast.makeText(OptionActivity.this, "Vibrano 1", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
-				} else {
-					number = USE_FLITE_TTS;
-					Toast toast = Toast.makeText(OptionActivity.this, "Vibrano 2", Toast.LENGTH_SHORT);
-					toast.setGravity(Gravity.CENTER, 0, 0);
-					toast.show();
-				}
-				getSettingsHolder().setUsedTts(number);
-			}
-		};
-		radioButton1 = (RadioButton) findViewById(R.id.radioButton1);
-		radioButton2 = (RadioButton) findViewById(R.id.radioButton2);
-		if (getSettingsHolder().getUsedTts() == USE_GOOGLE_TTS) {
-			radioButton1.setChecked(true);
-		} else {
-			radioButton2.setChecked(true);
-		}
-		radioButton1.setOnClickListener(radioButtonOnClick);
-		radioButton2.setOnClickListener(radioButtonOnClick);
-	}
+//	private void setUpTTSSelection() {
+//		OnClickListener radioButtonOnClick = new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				int number = 1;
+//				if (v.getId() == R.id.radioButton1) {
+//					number = USE_GOOGLE_TTS;
+//					Toast toast = Toast.makeText(OptionActivity.this, "Vibrano 1", Toast.LENGTH_SHORT);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.show();
+//				} else {
+//					number = USE_FLITE_TTS;
+//					Toast toast = Toast.makeText(OptionActivity.this, "Vibrano 2", Toast.LENGTH_SHORT);
+//					toast.setGravity(Gravity.CENTER, 0, 0);
+//					toast.show();
+//				}
+//				getSettingsHolder().setUsedTts(number);
+//			}
+//		};
+//		radioButton1 = (RadioButton) findViewById(R.id.radioButton1);
+//		radioButton2 = (RadioButton) findViewById(R.id.radioButton2);
+//		if (getSettingsHolder().getUsedTts() == USE_GOOGLE_TTS) {
+//			radioButton1.setChecked(true);
+//		} else {
+//			radioButton2.setChecked(true);
+//		}
+//		radioButton1.setOnClickListener(radioButtonOnClick);
+//		radioButton2.setOnClickListener(radioButtonOnClick);
+//	}
 
 	private void setUpCheckBoxUseTts() {
 		final CheckBox checkBoxUseTts = (CheckBox) findViewById(R.id.checkBox1);
 		checkBoxUseTts.setChecked(getSettingsHolder().isUseTtsToSay());
-		setRadioButtonsEnabled(getSettingsHolder().isUseTtsToSay());
+//		setRadioButtonsEnabled(getSettingsHolder().isUseTtsToSay());
 		checkBoxUseTts.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				getSettingsHolder().setUseTtsToSay(checkBoxUseTts.isChecked());
-				setRadioButtonsEnabled(checkBoxUseTts.isChecked());
+//				setRadioButtonsEnabled(checkBoxUseTts.isChecked());
 			}
 		});
 	}
 
-	private void setUpCheckBoxUseFiles() {
-		final CheckBox checkBoxUseFiles = (CheckBox) findViewById(R.id.checkBox2);
-		checkBoxUseFiles.setChecked(getSettingsHolder().isUseFilesToSay());
-		setForChB2Enabled(getSettingsHolder().isUseFilesToSay());
-		checkBoxUseFiles.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				getSettingsHolder().setUseFilesToSay(checkBoxUseFiles.isChecked());
-				setForChB2Enabled(checkBoxUseFiles.isChecked());
-			}
-		});
-	}
+//	private void setUpCheckBoxUseFiles() {
+//		final CheckBox checkBoxUseFiles = (CheckBox) findViewById(R.id.checkBox2);
+//		checkBoxUseFiles.setChecked(getSettingsHolder().isUseFilesToSay());
+//		setForChB2Enabled(getSettingsHolder().isUseFilesToSay());
+//		checkBoxUseFiles.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View v) {
+//				getSettingsHolder().setUseFilesToSay(checkBoxUseFiles.isChecked());
+//				setForChB2Enabled(checkBoxUseFiles.isChecked());
+//			}
+//		});
+//	}
 
-	private void setRadioButtonsEnabled(boolean b) {
-		radioButton1.setEnabled(b);
-		radioButton2.setEnabled(b);
-	}
-
-	private void setForChB2Enabled(boolean b) {
-		pathToSoundFilesField.setEnabled(b);
-		button.setEnabled(b);
-	}
+//	private void setRadioButtonsEnabled(boolean b) {
+//		radioButton1.setEnabled(b);
+//		radioButton2.setEnabled(b);
+//	}
+//
+//	private void setForChB2Enabled(boolean b) {
+//		pathToSoundFilesField.setEnabled(b);
+//		button.setEnabled(b);
+//	}
 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-		case REQUEST_CODE_SELECT_DIR:
-			if (resultCode == RESULT_OK) {
-				Bundle extras = data.getExtras();
-				String result = extras.getString(EXT_NAME_DIR) + "/";
-				if (result != null) {
-					pathToSoundFilesField.setText(result);
-					getSettingsHolder().setPathToSoundFiles(result);
-				}
-			}
-			break;
+//		case REQUEST_CODE_SELECT_DIR:
+//			if (resultCode == RESULT_OK) {
+//				Bundle extras = data.getExtras();
+//				String result = extras.getString(EXT_NAME_DIR) + "/";
+//				if (result != null) {
+//					pathToSoundFilesField.setText(result);
+//					getSettingsHolder().setPathToSoundFiles(result);
+//				}
+//			}
+//			break;
 		case REQUEST_CODE_SELECT_DB:
 			if (resultCode == RESULT_OK) {
 				Uri uri = data.getData();
